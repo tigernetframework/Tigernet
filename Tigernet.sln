@@ -3,7 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tigernet.Hosting", "src\Tigernet.Hosting\Tigernet.Hosting.csproj", "{EBE16CB2-AE1E-439E-A72E-303069684BDF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tigernet.Hosting", "src\Tigernet.Hosting\Tigernet.Hosting.csproj", "{EBE16CB2-AE1E-439E-A72E-303069684BDF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7EDEAE10-8413-4C0F-8E8A-D062F81CC415}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{3734CF8A-8C0A-4E62-A0E0-2E965136A11C}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Introduction.md = docs\Introduction.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,7 +27,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{EBE16CB2-AE1E-439E-A72E-303069684BDF} = {47E82885-6921-4513-9B04-2D936E4EA533}
+		{EBE16CB2-AE1E-439E-A72E-303069684BDF} = {7EDEAE10-8413-4C0F-8E8A-D062F81CC415}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FB2057EE-77C9-4AD1-8889-D23043D2A6C1}

@@ -1,0 +1,25 @@
+﻿{
+  "hosting": {
+    "public": "dist",
+    "url": "https://localhost:5000",
+    "port": 5000
+  },
+  "application": {
+    "name": "My App",
+    "description": "My App Description"
+  },
+  "runtime": {
+    "framework": {
+      "version": "0.0.1"
+    },
+    "execution": {
+      "environment": "development",
+      "commands": {
+        "start": "tnet run",
+        "build": "tnet build",
+        "test": "tnet test"
+      }
+    },
+    
+  }
+}
