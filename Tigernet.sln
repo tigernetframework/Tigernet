@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{3A3D4634-0889-440D-929D-7A6B6EB169D7}"
+	ProjectSection(SolutionItems) = preProject
+		Introduction.md = Introduction.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{47E82885-6921-4513-9B04-2D936E4EA533}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tigernet.Hosting", "Tigernet.Hosting\Tigernet.Hosting.csproj", "{EBE16CB2-AE1E-439E-A72E-303069684BDF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EBE16CB2-AE1E-439E-A72E-303069684BDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBE16CB2-AE1E-439E-A72E-303069684BDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBE16CB2-AE1E-439E-A72E-303069684BDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBE16CB2-AE1E-439E-A72E-303069684BDF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EBE16CB2-AE1E-439E-A72E-303069684BDF} = {47E82885-6921-4513-9B04-2D936E4EA533}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FB2057EE-77C9-4AD1-8889-D23043D2A6C1}
+	EndGlobalSection
+EndGlobal
