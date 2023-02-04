@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Extensions\" />
+    <ProjectReference Include="..\src\Tigernet.Hosting\Tigernet.Hosting.csproj" />
   </ItemGroup>
 
 </Project>

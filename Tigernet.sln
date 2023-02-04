@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{3734CF8A-8
 		docs\Introduction.md = docs\Introduction.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tigernet.Samples.RestApi", "Tigernet.Samples.RestApi\Tigernet.Samples.RestApi.csproj", "{EB90972B-5709-47A0-B6ED-B478CB01A356}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,12 +24,17 @@ Global
 		{EBE16CB2-AE1E-439E-A72E-303069684BDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBE16CB2-AE1E-439E-A72E-303069684BDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBE16CB2-AE1E-439E-A72E-303069684BDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB90972B-5709-47A0-B6ED-B478CB01A356}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB90972B-5709-47A0-B6ED-B478CB01A356}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB90972B-5709-47A0-B6ED-B478CB01A356}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB90972B-5709-47A0-B6ED-B478CB01A356}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{EBE16CB2-AE1E-439E-A72E-303069684BDF} = {7EDEAE10-8413-4C0F-8E8A-D062F81CC415}
+		{EB90972B-5709-47A0-B6ED-B478CB01A356} = {7EDEAE10-8413-4C0F-8E8A-D062F81CC415}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FB2057EE-77C9-4AD1-8889-D23043D2A6C1}

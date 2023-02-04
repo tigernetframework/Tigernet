@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Tigernet.Hosting.Actions;
+using Tigernet.Hosting.Attributes;
 
 namespace Tigernet.Hosting
 {
@@ -50,6 +52,35 @@ namespace Tigernet.Hosting
             {
                 response.StatusCode = (int)HttpStatusCode.NotFound;
                 response.Close();
+            }
+        }
+
+        public void MapRester<T>(string route) where T : ResterBase, new()
+        {
+            var rester = new T();
+            var type = rester.GetType();
+            var methods = type.GetMethods();
+            foreach (var method in methods)
+            {
+                var attributes = method.GetCustomAttributes(typeof(GetterAttribute), false);
+                if (attributes.Length > 0)
+                {
+                    var attribute = attributes[0] as GetterAttribute;
+           
+                    var routeUrl = route + attribute.Route;
+                    MapRoute(routeUrl, async context =>
+                    {
+                        var response = context.Response;
+                        response.ContentType = "application/json";
+                        var result = method.Invoke(rester, null);
+                        var content = Encoding.UTF8.GetBytes(result.ToString());
+                        response.ContentLength64 = content.Length;
+                        using (var output = response.OutputStream)
+                        {
+                            await output.WriteAsync(content, 0, content.Length);
+                        }
+                    });
+                }
             }
         }
     }
