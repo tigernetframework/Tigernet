@@ -14,7 +14,7 @@ namespace Tigernet.Samples.RestApi.Resters
             });
         }
 
-        [Getter(Route = "/show")]
+        [Getter("/show")]
         public object ShowMessage()
         {
             return Ok(new

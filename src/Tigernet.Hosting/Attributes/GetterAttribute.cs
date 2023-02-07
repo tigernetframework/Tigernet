@@ -2,6 +2,10 @@
 {
     public class GetterAttribute : Attribute
     {
-        public string Route { get; set; }
+        public readonly string route;
+        public GetterAttribute(string route = null)
+        {
+            this.route = route;
+        }
     }
 }

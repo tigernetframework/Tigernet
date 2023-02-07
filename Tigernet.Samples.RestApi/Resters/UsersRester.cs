@@ -9,7 +9,7 @@ namespace Tigernet.Samples.RestApi.Resters
     {
         private readonly IUserClever userClever = new UserClever();
 
-        [Getter(Route = "/all")]
+        [Getter("/all")]
         public object GetAll()
         {
             return Ok(userClever.GetAll());

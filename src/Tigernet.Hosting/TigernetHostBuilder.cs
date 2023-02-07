@@ -121,7 +121,7 @@ namespace Tigernet.Hosting
                             StringSplitOptions.None).FirstOrDefault());
                     }
                     
-                    var routeUrl = (route + attribute.Route).ToLower();
+                    var routeUrl = (route + attribute.route).ToLower();
                     MapRoute(routeUrl, async context =>
                     {
                         var response = context.Response;
