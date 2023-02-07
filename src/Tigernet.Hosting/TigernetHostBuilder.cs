@@ -2,6 +2,7 @@
 using System.Text;
 using Tigernet.Hosting.Actions;
 using Tigernet.Hosting.Attributes;
+using Tigernet.Hosting.Exceptions;
 
 namespace Tigernet.Hosting
 {
@@ -47,6 +48,10 @@ namespace Tigernet.Hosting
         /// <param name="handler">The handler function to be associated with the route</param>
         public void MapRoute(string route, Func<HttpListenerContext, Task> handler)
         {
+            // check for exist of route
+            if (_routes.ContainsKey(route))
+                throw new RouteDublicatedException();
+            
             _routes.Add(route, handler);
         }
 

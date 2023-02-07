@@ -13,5 +13,14 @@ namespace Tigernet.Samples.RestApi.Resters
                 Message = "Hello World!"
             });
         }
+
+        [Getter(Route = "/show")]
+        public object ShowMessage()
+        {
+            return Ok(new
+            {
+                Message = "Check for dublication of routes"
+            });
+        }
     }
 }
