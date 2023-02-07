@@ -8,7 +8,7 @@ namespace Tigernet.Samples.RestApi.Resters
     public class UsersRester : ResterBase
     {
         private readonly IUserClever userClever = new UserClever();
-        
+
         [Getter(Route = "/all")]
         public object GetAll()
         {

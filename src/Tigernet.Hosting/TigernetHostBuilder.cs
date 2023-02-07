@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using Tigernet.Hosting.Actions;
 using Tigernet.Hosting.Attributes;
 
@@ -23,12 +19,12 @@ namespace Tigernet.Hosting
         /// A readonly field for storing the prefix for the HTTP listener.
         /// </summary>
         private readonly string _prefix;
-        
+
         /// <summary>
         /// An instance of HttpListener to listen for incoming requests.
         /// </summary>
         private readonly HttpListener _listener = new HttpListener();
-        
+
         /// <summary>
         /// A dictionary to store the routes and their associated handlers functions.
         /// </summary>
@@ -43,7 +39,7 @@ namespace Tigernet.Hosting
             _prefix = prefix;
             _listener.Prefixes.Add(prefix);
         }
-        
+
         /// <summary>
         /// Method used to map a route to a specific handler function.
         /// </summary>
@@ -53,7 +49,7 @@ namespace Tigernet.Hosting
         {
             _routes.Add(route, handler);
         }
-        
+
         /// <summary>
         /// Start method starts the HTTP listener and listens for incoming requests.
         /// It writes a message in the console indicating the server is running on the specified prefix.
@@ -92,7 +88,7 @@ namespace Tigernet.Hosting
                 response.Close();
             }
         }
-        
+
         /// <summary>
         /// Maps the REST API endpoint for the given route and ResterBase implementation.
         /// The methods decorated with the GetterAttribute are extracted and mapped to their corresponding route URL
@@ -111,7 +107,7 @@ namespace Tigernet.Hosting
                 if (attributes.Length > 0)
                 {
                     var attribute = attributes[0] as GetterAttribute;
-           
+
                     var routeUrl = route + attribute.Route;
                     MapRoute(routeUrl, async context =>
                     {
