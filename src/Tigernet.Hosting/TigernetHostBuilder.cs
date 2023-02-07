@@ -96,10 +96,11 @@ namespace Tigernet.Hosting
         /// </summary>
         /// <typeparam name="T">The type of the ResterBase implementations</typeparam>
         /// <param name="route">The base route URL for the REST API endpoints</param>
-        public void MapRester<T>(string route) where T : ResterBase, new()
+        public void MapRester<T>(string route = null) where T : ResterBase, new()
         {
             var rester = new T();
             var type = rester.GetType();
+            var typeName = type.Name;
             var methods = type.GetMethods();
             foreach (var method in methods)
             {
@@ -108,7 +109,14 @@ namespace Tigernet.Hosting
                 {
                     var attribute = attributes[0] as GetterAttribute;
 
-                    var routeUrl = route + attribute.Route;
+                    // if route is null, use the route from the class name
+                    if (string.IsNullOrEmpty(route))
+                    {
+                        route = Path.Combine("/", typeName.Split(new[] { "Rester" }, 
+                            StringSplitOptions.None).FirstOrDefault());
+                    }
+                    
+                    var routeUrl = (route + attribute.Route).ToLower();
                     MapRoute(routeUrl, async context =>
                     {
                         var response = context.Response;
