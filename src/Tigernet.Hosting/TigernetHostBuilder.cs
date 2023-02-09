@@ -1,10 +1,8 @@
 ﻿using System.Net;
-using System.Net.Http;
 using System.Text;
 using Tigernet.Hosting.Actions;
 using Tigernet.Hosting.Attributes;
 using Tigernet.Hosting.Exceptions;
-using Tigernet.Hosting.Http;
 
 namespace Tigernet.Hosting
 {
@@ -58,7 +56,7 @@ namespace Tigernet.Hosting
             // check for exist of route
             if (_routes.ContainsKey(route))
                 throw new RouteDublicatedException();
-            
+
             _routes.Add(route, handler);
         }
 
@@ -147,10 +145,10 @@ namespace Tigernet.Hosting
                     // if route is null, use the route from the class name
                     if (string.IsNullOrEmpty(route))
                     {
-                        route = Path.Combine("/", typeName.Split(new[] { "Rester" }, 
+                        route = Path.Combine("/", typeName.Split(new[] { "Rester" },
                             StringSplitOptions.None).FirstOrDefault());
                     }
-                    
+
                     var routeUrl = (route + attribute.route).ToLower();
                     MapRoute(routeUrl, async context =>
                     {
