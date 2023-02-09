@@ -1,8 +1,10 @@
 ﻿using System.Net;
+using System.Net.Http;
 using System.Text;
 using Tigernet.Hosting.Actions;
 using Tigernet.Hosting.Attributes;
 using Tigernet.Hosting.Exceptions;
+using Tigernet.Hosting.Http;
 
 namespace Tigernet.Hosting
 {
@@ -30,6 +32,11 @@ namespace Tigernet.Hosting
         /// A dictionary to store the routes and their associated handlers functions.
         /// </summary>
         private readonly Dictionary<string, Func<HttpListenerContext, Task>> _routes = new Dictionary<string, Func<HttpListenerContext, Task>>();
+
+        /// <summary>
+        /// A list of middleware functions.
+        /// </summary>
+        internal readonly List<Func<HttpListenerContext, Task>> _middlewares = new List<Func<HttpListenerContext, Task>>();
 
         /// <summary>
         /// Constructor for TigernetHostBuilder class. It takes in a string prefix and sets it as the prefix for the HttpListener.
@@ -67,7 +74,7 @@ namespace Tigernet.Hosting
             while (true)
             {
                 var context = await _listener.GetContextAsync();
-                await HandleRequest(context);
+                await HandleRequestAsync(context);
             }
         }
 
@@ -77,11 +84,34 @@ namespace Tigernet.Hosting
         /// If there is no matching route, it sets the response status code to "Not Found" and closes the response.
         /// </summary>
         /// <param name="context">The HttpListenerContext representing the incoming request and response</param>
-        private async Task HandleRequest(HttpListenerContext context)
+        private async Task HandleRequestAsync(HttpListenerContext context)
         {
+            // get the route from the request URL
+            // apply _middlewares to the request and response here
             var request = context.Request;
             var response = context.Response;
 
+            // check middleware is exist
+            if (_middlewares.Any())
+            {
+                foreach (var next in _middlewares)
+                {
+                    // check route is exist
+                    if (!_routes.ContainsKey(request.Url.AbsolutePath))
+                    {
+                        response.StatusCode = (int)HttpStatusCode.NotFound;
+                        response.Close();
+
+                        return;
+                    }
+                    else
+                    {
+                        await next(context);
+                    }
+                }
+            }
+
+            // if middleware is not exist
             Func<HttpListenerContext, Task> handler;
             if (_routes.TryGetValue(request.RawUrl, out handler))
             {
@@ -136,6 +166,18 @@ namespace Tigernet.Hosting
                     });
                 }
             }
+        }
+
+        /// <summary>
+        /// Using middleware
+        /// </summary>
+        /// <param name="middleware"></param>
+        /// <returns></returns>
+        public TigernetHostBuilder UseAsync(Func<HttpListenerContext, Task> middleware)
+        {
+            _middlewares.Add(middleware);
+
+            return this;
         }
     }
 }
