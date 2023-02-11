@@ -2,6 +2,7 @@
 using System.Text;
 using Tigernet.Hosting.Actions;
 using Tigernet.Hosting.Attributes;
+using Tigernet.Hosting.Attributes.Commons;
 using Tigernet.Hosting.Exceptions;
 
 namespace Tigernet.Hosting
@@ -137,10 +138,10 @@ namespace Tigernet.Hosting
             var methods = type.GetMethods();
             foreach (var method in methods)
             {
-                var attributes = method.GetCustomAttributes(typeof(GetterAttribute), false);
+                var attributes = method.GetCustomAttributes(typeof(HttpMethodAttribute), false);
                 if (attributes.Length > 0)
                 {
-                    var attribute = attributes[0] as GetterAttribute;
+                    var attribute = attributes[0] as HttpMethodAttribute;
 
                     // if route is null, use the route from the class name
                     if (string.IsNullOrEmpty(route))
@@ -154,12 +155,21 @@ namespace Tigernet.Hosting
                     {
                         var response = context.Response;
                         response.ContentType = "application/json";
-                        var result = method.Invoke(rester, null);
-                        var content = Encoding.UTF8.GetBytes(result.ToString());
-                        response.ContentLength64 = content.Length;
-                        using (var output = response.OutputStream)
+
+                        if (context.Request.HttpMethod == attribute.HttpMethodName)
                         {
-                            await output.WriteAsync(content, 0, content.Length);
+                            var result = method.Invoke(rester, null);
+                            var content = Encoding.UTF8.GetBytes(result.ToString());
+                            response.ContentLength64 = content.Length;
+                            using (var output = response.OutputStream)
+                            {
+                                await output.WriteAsync(content, 0, content.Length);
+                            }
+                        }
+                        else
+                        {
+                            response.StatusCode = (int)HttpStatusCode.NotFound;
+                            response.Close();
                         }
                     });
                 }

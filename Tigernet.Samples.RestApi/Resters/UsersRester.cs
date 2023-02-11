@@ -1,7 +1,8 @@
 ﻿using Tigernet.Hosting.Actions;
-using Tigernet.Hosting.Attributes;
+using Tigernet.Hosting.Attributes.HttpMethods;
 using Tigernet.Samples.RestApi.Abstractions;
 using Tigernet.Samples.RestApi.Clevers;
+using Tigernet.Samples.RestApi.Models;
 
 namespace Tigernet.Samples.RestApi.Resters
 {
@@ -19,6 +20,20 @@ namespace Tigernet.Samples.RestApi.Resters
         public object Get()
         {
             return Ok(userClever.Get(1));
+        }
+
+        [Poster("/new")]
+        public object Add()
+        {
+            User user = new User()
+            {
+                Id = 7,
+                Name = "Ikrom",
+                Age = 28
+
+            }; 
+
+            return Ok(userClever.Add(user));
         }
     }
 }
