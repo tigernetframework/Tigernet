@@ -6,5 +6,6 @@ namespace Tigernet.Samples.RestApi.Abstractions
     {
         User Get(int id);
         IEnumerable<User> GetAll();
+        User Add(User user);
     }
 }

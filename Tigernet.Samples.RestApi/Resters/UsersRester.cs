@@ -1,7 +1,7 @@
 ﻿using Tigernet.Hosting.Actions;
-using Tigernet.Hosting.Attributes;
+using Tigernet.Hosting.Attributes.HttpMethods;
 using Tigernet.Samples.RestApi.Abstractions;
-
+using Tigernet.Samples.RestApi.Models;
 namespace Tigernet.Samples.RestApi.Resters
 {
     public class UsersRester : ResterBase
@@ -13,7 +13,8 @@ namespace Tigernet.Samples.RestApi.Resters
             this.userClever = userClever;
         }
 
-        [Getter(Route = "/all")]
+
+        [Getter("/all")]
         public object GetAll()
         {
             return Ok(userClever.GetAll());
@@ -23,6 +24,20 @@ namespace Tigernet.Samples.RestApi.Resters
         public object Get()
         {
             return Ok(userClever.Get(1));
+        }
+
+        [Poster("/new")]
+        public object Add()
+        {
+            User user = new User()
+            {
+                Id = 7,
+                Name = "Ikrom",
+                Age = 28
+
+            }; 
+
+            return Ok(userClever.Add(user));
         }
     }
 }
