@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Concurrent;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using Tigernet.Hosting.Actions;
 using Tigernet.Hosting.Attributes;
 
 namespace Tigernet.Hosting
 {
-    public class TigernetHostBuilder
+    public partial class TigernetHostBuilder
     {
         private readonly string _prefix;
         private readonly HttpListener _listener = new HttpListener();
@@ -19,6 +16,7 @@ namespace Tigernet.Hosting
         {
             _prefix = prefix;
             _listener.Prefixes.Add(prefix);
+            _services = new Dictionary<Type, Type>();
         }
 
 
@@ -55,10 +53,27 @@ namespace Tigernet.Hosting
             }
         }
 
-        public void MapRester<T>(string route) where T : ResterBase, new()
+        public void MapRester<T>(string route) where T : ResterBase
         {
-            var rester = new T();
-            var type = rester.GetType();
+            T rester;
+            var type = typeof(T);
+            var constructor = type.GetConstructors()[0];
+            var parameters = constructor.GetParameters();
+            if (parameters.Length == 0)
+            {
+                rester = (T)Activator.CreateInstance(type);
+            }
+
+            else
+            {
+                var parameterInstances = new object[parameters.Length];
+                for (var i = 0; i < parameters.Length; i++)
+                {
+                    parameterInstances[i] = GetService(parameters[i].ParameterType);
+                }
+
+                rester = (T)constructor.Invoke(parameterInstances);
+            }
             var methods = type.GetMethods();
             foreach (var method in methods)
             {
@@ -66,7 +81,7 @@ namespace Tigernet.Hosting
                 if (attributes.Length > 0)
                 {
                     var attribute = attributes[0] as GetterAttribute;
-           
+
                     var routeUrl = route + attribute.Route;
                     MapRoute(routeUrl, async context =>
                     {
