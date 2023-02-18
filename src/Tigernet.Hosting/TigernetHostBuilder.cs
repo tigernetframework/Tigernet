@@ -59,7 +59,7 @@ namespace Tigernet.Hosting
         {
             // check for exist of route
             if (_routes.ContainsKey(route))
-                throw new RouteDublicatedException();
+                throw new RouteDuplicatedException(route);
 
             _routes.Add(route, handler);
         }
