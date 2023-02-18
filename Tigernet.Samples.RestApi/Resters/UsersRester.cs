@@ -1,14 +1,18 @@
 ﻿using Tigernet.Hosting.Actions;
 using Tigernet.Hosting.Attributes.HttpMethods;
 using Tigernet.Samples.RestApi.Abstractions;
-using Tigernet.Samples.RestApi.Clevers;
 using Tigernet.Samples.RestApi.Models;
-
 namespace Tigernet.Samples.RestApi.Resters
 {
     public class UsersRester : ResterBase
     {
-        private readonly IUserClever userClever = new UserClever();
+        private readonly IUserClever userClever;
+
+        public UsersRester(IUserClever userClever)
+        {
+            this.userClever = userClever;
+        }
+
 
         [Getter("/all")]
         public object GetAll()

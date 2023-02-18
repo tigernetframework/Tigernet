@@ -1,5 +1,4 @@
 ﻿using Tigernet.Hosting.Actions;
-using Tigernet.Hosting.Attributes;
 using Tigernet.Hosting.Attributes.HttpMethods;
 
 namespace Tigernet.Samples.RestApi.Resters
