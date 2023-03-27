@@ -1,7 +1,10 @@
+﻿using System.Collections.Concurrent;
+using System.Net;
 ﻿using System.Net;
 using System.Text;
 using Tigernet.Hosting.Actions;
 using Tigernet.Hosting.Attributes;
+using Tigernet.Hosting.Attributes.Commons;
 using Tigernet.Hosting.Exceptions;
 
 namespace Tigernet.Hosting
@@ -14,7 +17,7 @@ namespace Tigernet.Hosting
     /// The ResterBase class is a base class for creating REST APIs, and it uses custom attributes to identify the endpoint URLs.
     /// The Start method is used to start the web server and listen for incoming requests.
     /// </summary>
-    public class TigernetHostBuilder
+    public partial class TigernetHostBuilder
     {
         /// <summary>
         /// A readonly field for storing the prefix for the HTTP listener.
@@ -44,6 +47,7 @@ namespace Tigernet.Hosting
         {
             _prefix = prefix;
             _listener.Prefixes.Add(prefix);
+            _services = new Dictionary<Type, Type>();
         }
 
         /// <summary>
@@ -55,7 +59,7 @@ namespace Tigernet.Hosting
         {
             // check for exist of route
             if (_routes.ContainsKey(route))
-                throw new RouteDublicatedException();
+                throw new RouteDuplicatedException(route);
 
             _routes.Add(route, handler);
         }
@@ -121,61 +125,86 @@ namespace Tigernet.Hosting
                 response.Close();
             }
         }
-
-        /// <summary>
-        /// Maps the REST API endpoint for the given route and ResterBase implementation.
-        /// The methods decorated with the GetterAttribute are extracted and mapped to their corresponding route URL
-        /// The response is returned in JSON format.
-        /// </summary>
-        /// <typeparam name="T">The type of the ResterBase implementations</typeparam>
-        /// <param name="route">The base route URL for the REST API endpoints</param>
-        public void MapRester<T>(string route = null) where T : ResterBase, new()
-        {
-            var rester = new T();
-            var type = rester.GetType();
-            var typeName = type.Name;
-            var methods = type.GetMethods();
-            foreach (var method in methods)
+            /// <summary>
+            /// Maps the REST API endpoint for the given route and ResterBase implementation.
+            /// The methods decorated with the GetterAttribute are extracted and mapped to their corresponding route URL
+            /// The response is returned in JSON format.
+            /// </summary>
+            /// <typeparam name="T">The type of the ResterBase implementations</typeparam>
+            /// <param name="route">The base route URL for the REST API endpoints</param>
+            public void MapRester<T>(string route = null) where T : ResterBase
             {
-                var attributes = method.GetCustomAttributes(typeof(GetterAttribute), false);
-                if (attributes.Length > 0)
+                T rester;
+                var type = typeof(T);
+                var constructor = type.GetConstructors()[0];
+                var parameters = constructor.GetParameters();
+                if (parameters.Length == 0)
                 {
-                    var attribute = attributes[0] as GetterAttribute;
+                    rester = (T)Activator.CreateInstance(type);
+                }
 
-                    // if route is null, use the route from the class name
-                    if (string.IsNullOrEmpty(route))
+                else
+                {
+                    var parameterInstances = new object[parameters.Length];
+                    for (var i = 0; i < parameters.Length; i++)
                     {
-                        route = Path.Combine("/", typeName.Split(new[] { "Rester" },
-                            StringSplitOptions.None).FirstOrDefault());
+                        parameterInstances[i] = GetService(parameters[i].ParameterType);
                     }
 
-                    var routeUrl = (route + attribute.route).ToLower();
-                    MapRoute(routeUrl, async context =>
+                    rester = (T)constructor.Invoke(parameterInstances);
+                }
+                var typeName = type.Name;
+                var methods = type.GetMethods();
+                foreach (var method in methods)
+                {
+                    var attributes = method.GetCustomAttributes(typeof(HttpMethodAttribute), false);
+                    if (attributes.Length > 0)
                     {
-                        var response = context.Response;
-                        response.ContentType = "application/json";
-                        var result = method.Invoke(rester, null);
-                        var content = Encoding.UTF8.GetBytes(result.ToString());
-                        response.ContentLength64 = content.Length;
-                        using (var output = response.OutputStream)
+                        var attribute = attributes[0] as HttpMethodAttribute;
+
+                        // if route is null, use the route from the class name
+                        if (string.IsNullOrEmpty(route))
                         {
-                            await output.WriteAsync(content, 0, content.Length);
+                            route = Path.Combine("/", typeName.Split(new[] { "Rester" },
+                                StringSplitOptions.None).FirstOrDefault());
                         }
-                    });
+
+                        var routeUrl = (route + attribute.route).ToLower();
+                        MapRoute(routeUrl, async context =>
+                        {
+                            var response = context.Response;
+                            response.ContentType = "application/json";
+
+                            if (context.Request.HttpMethod == attribute.HttpMethodName)
+                            {
+                                var result = method.Invoke(rester, null);
+                                var content = Encoding.UTF8.GetBytes(result.ToString());
+                                response.ContentLength64 = content.Length;
+                                using (var output = response.OutputStream)
+                                {
+                                    await output.WriteAsync(content, 0, content.Length);
+                                }
+                            }
+                            else
+                            {
+                                response.StatusCode = (int)HttpStatusCode.NotFound;
+                                response.Close();
+                            }
+                        });
+                    }
                 }
             }
-        }
 
-        /// <summary>
-        /// Using middleware
-        /// </summary>
-        /// <param name="middleware"></param>
-        /// <returns></returns>
-        public TigernetHostBuilder UseAsync(Func<HttpListenerContext, Task> middleware)
-        {
-            _middlewares.Add(middleware);
+            /// <summary>
+            /// Using middleware
+            /// </summary>
+            /// <param name="middleware"></param>
+            /// <returns></returns>
+            public TigernetHostBuilder UseAsync(Func<HttpListenerContext, Task> middleware)
+            {
+                _middlewares.Add(middleware);
 
-            return this;
+                return this;
+            }
         }
-    }
 }

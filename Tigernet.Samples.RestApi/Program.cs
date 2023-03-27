@@ -1,9 +1,12 @@
 ﻿using Tigernet.Hosting;
+using Tigernet.Samples.RestApi.Abstractions;
+using Tigernet.Samples.RestApi.Clevers;
 using Tigernet.Samples.RestApi.Resters;
 
 var builder = new TigernetHostBuilder("http://localhost:5000/");
 
-// add rester to the host
+builder.AddService<IUserClever, UserClever>();
+
 builder.MapRester<UsersRester>();
 builder.MapRester<HomeRester>();
 

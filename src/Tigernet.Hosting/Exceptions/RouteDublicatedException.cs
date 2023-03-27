@@ -1,7 +1,10 @@
 ﻿namespace Tigernet.Hosting.Exceptions
 {
-    public class RouteDublicatedException : Exception
+    public class RouteDuplicatedException : Exception
     {
-        public override string Message => "Route was dublicated, you have already added this route!";
+        public RouteDuplicatedException(string route)
+            : base($"Route '{route}' already exists, please provide a unique route!")
+        {
+        }
     }
 }
