@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Tigernet.Samples.RestApi.Models
+﻿namespace Tigernet.Samples.RestApi.Models
 {
     public class User
     {
