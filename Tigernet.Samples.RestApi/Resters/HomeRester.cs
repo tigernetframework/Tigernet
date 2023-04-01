@@ -1,8 +1,10 @@
 ﻿using Tigernet.Hosting.Actions;
 using Tigernet.Hosting.Attributes.HttpMethods;
+using Tigernet.Hosting.Attributes.Resters;
 
 namespace Tigernet.Samples.RestApi.Resters
 {
+    [ApiRester]
     public class HomeRester : ResterBase
     {
         [Getter]
