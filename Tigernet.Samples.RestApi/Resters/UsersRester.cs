@@ -1,9 +1,11 @@
 ﻿using Tigernet.Hosting.Actions;
 using Tigernet.Hosting.Attributes.HttpMethods;
+using Tigernet.Hosting.Attributes.Resters;
 using Tigernet.Samples.RestApi.Abstractions;
 using Tigernet.Samples.RestApi.Models;
 namespace Tigernet.Samples.RestApi.Resters
 {
+    [ApiRester]
     public class UsersRester : ResterBase
     {
         private readonly IUserClever userClever;
@@ -35,7 +37,7 @@ namespace Tigernet.Samples.RestApi.Resters
                 Name = "Ikrom",
                 Age = 28
 
-            }; 
+            };
 
             return Ok(userClever.Add(user));
         }
