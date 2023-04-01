@@ -7,12 +7,12 @@ namespace Tigernet.Hosting.Attributes.HttpMethods;
 /// </summary>
 public class GetterAttribute : HttpMethodAttribute
 {
-	/// <inheritdoc />
-	public GetterAttribute(string route = null)
-		: base(route)
-	{
-	}
-    
-	/// <inheritdoc/>
+    /// <inheritdoc />
+    public GetterAttribute(string route = null)
+        : base(route)
+    {
+    }
+
+    /// <inheritdoc/>
     internal override string HttpMethodName { get => "GET"; }
 }

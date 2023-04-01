@@ -1,10 +1,10 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Data;
 using System.Net;
-﻿using System.Net;
+using System.Reflection;
 using System.Text;
-using Tigernet.Hosting.Actions;
-using Tigernet.Hosting.Attributes;
 using Tigernet.Hosting.Attributes.Commons;
+using Tigernet.Hosting.Attributes.HttpMethods;
+using Tigernet.Hosting.Attributes.Resters;
 using Tigernet.Hosting.Exceptions;
 
 namespace Tigernet.Hosting
@@ -125,86 +125,126 @@ namespace Tigernet.Hosting
                 response.Close();
             }
         }
-            /// <summary>
-            /// Maps the REST API endpoint for the given route and ResterBase implementation.
-            /// The methods decorated with the GetterAttribute are extracted and mapped to their corresponding route URL
-            /// The response is returned in JSON format.
-            /// </summary>
-            /// <typeparam name="T">The type of the ResterBase implementations</typeparam>
-            /// <param name="route">The base route URL for the REST API endpoints</param>
-            public void MapRester<T>(string route = null) where T : ResterBase
+
+        /// <summary>
+        /// Using middleware
+        /// </summary>
+        /// <param name="middleware"></param>
+        /// <returns></returns>
+        public TigernetHostBuilder UseAsync(Func<HttpListenerContext, Task> middleware)
+        {
+            _middlewares.Add(middleware);
+
+            return this;
+        }
+
+        public void MapResters()
+        {
+            // get the assembly that is using this library
+            var assembly = Assembly.GetCallingAssembly();
+
+            // get all types in the assembly
+            var types = assembly.GetTypes();
+
+            // filter for types that have the ApiRester attribute
+            var resterTypes = types.Where(t => t.GetCustomAttribute<ApiResterAttribute>() != null);
+
+            foreach (var resterType in resterTypes)
             {
-                T rester;
-                var type = typeof(T);
-                var constructor = type.GetConstructors()[0];
-                var parameters = constructor.GetParameters();
-                if (parameters.Length == 0)
-                {
-                    rester = (T)Activator.CreateInstance(type);
-                }
+                var methods = resterType.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                    .Where(m => m.GetCustomAttribute<GetterAttribute>() != null || m.GetCustomAttribute<PosterAttribute>() != null);
 
-                else
-                {
-                    var parameterInstances = new object[parameters.Length];
-                    for (var i = 0; i < parameters.Length; i++)
-                    {
-                        parameterInstances[i] = GetService(parameters[i].ParameterType);
-                    }
+                var typeName = resterType.Name;
 
-                    rester = (T)constructor.Invoke(parameterInstances);
-                }
-                var typeName = type.Name;
-                var methods = type.GetMethods();
                 foreach (var method in methods)
                 {
-                    var attributes = method.GetCustomAttributes(typeof(HttpMethodAttribute), false);
-                    if (attributes.Length > 0)
+                    var getterAttr = method.GetCustomAttribute<GetterAttribute>();
+                    var posterAttr = method.GetCustomAttribute<PosterAttribute>();
+
+                    var endpointAttr = getterAttr != null ? getterAttr : (HttpMethodAttribute)posterAttr;
+
+                    var route = Path.Combine("/", typeName.Split(new[] { "Rester" },
+                            StringSplitOptions.None).FirstOrDefault());
+
+                    var routeUrl = (route + endpointAttr.route).ToLower();
+
+                    var handler = CreateHandlerFunc(resterType, method);
+
+                    MapRoute(routeUrl, handler);
+                }
+            }
+        }
+
+        private Func<HttpListenerContext, Task> CreateHandlerFunc(Type resterType, MethodInfo method)
+        {
+            return async context =>
+            {
+                object rester;
+                var constructor = resterType.GetConstructors().FirstOrDefault();
+
+                if (constructor != null)
+                {
+                    var parameters = constructor.GetParameters();
+                    var parameterInstances = new object[parameters.Length];
+
+                    for (var i = 0; i < parameters.Length; i++)
                     {
-                        var attribute = attributes[0] as HttpMethodAttribute;
-
-                        // if route is null, use the route from the class name
-                        if (string.IsNullOrEmpty(route))
+                        var parameterType = parameters[i].ParameterType;
+                        var service = GetService(parameterType);
+                        if (service != null)
                         {
-                            route = Path.Combine("/", typeName.Split(new[] { "Rester" },
-                                StringSplitOptions.None).FirstOrDefault());
+                            parameterInstances[i] = service;
                         }
-
-                        var routeUrl = (route + attribute.route).ToLower();
-                        MapRoute(routeUrl, async context =>
+                        else
                         {
-                            var response = context.Response;
-                            response.ContentType = "application/json";
-
-                            if (context.Request.HttpMethod == attribute.HttpMethodName)
-                            {
-                                var result = method.Invoke(rester, null);
-                                var content = Encoding.UTF8.GetBytes(result.ToString());
-                                response.ContentLength64 = content.Length;
-                                using (var output = response.OutputStream)
-                                {
-                                    await output.WriteAsync(content, 0, content.Length);
-                                }
-                            }
-                            else
-                            {
-                                response.StatusCode = (int)HttpStatusCode.NotFound;
-                                response.Close();
-                            }
-                        });
+                            throw new Exception($"Unable to resolve service of type {parameterType} for constructor of {resterType}.");
+                        }
                     }
+
+                    rester = constructor.Invoke(parameterInstances);
+                }
+                else
+                {
+                    rester = Activator.CreateInstance(resterType);
+                }
+
+                var args = GetArguments(method, context);
+                var result = method.Invoke(rester, args);
+
+                if (result is Task task)
+                {
+                    await task;
+                }
+
+                var response = context.Response;
+                var content = Encoding.UTF8.GetBytes(result.ToString());
+                response.ContentLength64 = content.Length;
+                using (var output = response.OutputStream)
+                {
+                    await output.WriteAsync(content, 0, content.Length);
+                }
+            };
+        }
+
+        private object[] GetArguments(MethodInfo method, HttpListenerContext context)
+        {
+            var parameters = method.GetParameters();
+            var args = new object[parameters.Length];
+
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                var parameterType = parameters[i].ParameterType;
+                if (parameterType == typeof(HttpListenerContext))
+                {
+                    args[i] = context;
+                }
+                else
+                {
+                    args[i] = null;
                 }
             }
 
-            /// <summary>
-            /// Using middleware
-            /// </summary>
-            /// <param name="middleware"></param>
-            /// <returns></returns>
-            public TigernetHostBuilder UseAsync(Func<HttpListenerContext, Task> middleware)
-            {
-                _middlewares.Add(middleware);
-
-                return this;
-            }
+            return args;
         }
+    }
 }

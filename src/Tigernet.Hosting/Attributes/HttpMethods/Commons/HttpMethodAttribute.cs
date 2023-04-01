@@ -4,7 +4,7 @@
 /// Identifies an action that supports a given set of HTTP methods.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
-public abstract class HttpMethodAttribute : Attribute 
+public abstract class HttpMethodAttribute : Attribute
 {
     /// <summary>
     /// The <see href="route"/> field represents the route of the HTTP method decorated by the attribute.
@@ -21,7 +21,7 @@ public abstract class HttpMethodAttribute : Attribute
     /// </summary>
     /// <param name="route">path of route</param>
     public HttpMethodAttribute(string route = null)
-	{
-		this.route = route;
-	}
+    {
+        this.route = route;
+    }
 }
