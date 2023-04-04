@@ -1,6 +1,6 @@
 ﻿using Tigernet.Hosting;
-using Tigernet.Samples.RestApi.Abstractions;
 using Tigernet.Samples.RestApi.Clevers;
+using Tigernet.Samples.RestApi.Clevers.Interfaces;
 
 var builder = new TigernetHostBuilder("http://localhost:5000/");
 
