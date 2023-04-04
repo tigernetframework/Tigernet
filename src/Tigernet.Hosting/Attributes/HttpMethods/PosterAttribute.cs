@@ -1,4 +1,4 @@
-﻿using Tigernet.Hosting.Attributes.Commons;
+﻿using Tigernet.Hosting.Attributes.HttpMethods.Commons;
 
 namespace Tigernet.Hosting.Attributes.HttpMethods;
 
