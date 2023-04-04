@@ -7,14 +7,17 @@ using Tigernet.Hosting.Attributes.Commons;
 
 namespace Tigernet.Hosting.Attributes.HttpMethods
 {
-    public class PatcherAttribute : HttpMethodAttribute
+    public class PutterAttribute : HttpMethodAttribute
     {
-        public PatcherAttribute(string route = null)
-        : base(route)
+        /// <inheritdoc />
+        public PutterAttribute(string route = null)
+            : base(route)
         {
+
         }
 
         /// <inheritdoc/>
-        internal override string HttpMethodName { get => "PATCH"; }
+        internal override string HttpMethodName { get => "PUT"; }
+
     }
 }
