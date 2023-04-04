@@ -1,11 +1,15 @@
-﻿using System.Data;
+using System.Data;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using Tigernet.Hosting.Attributes.Commons;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 using Tigernet.Hosting.Attributes.HttpMethods;
+using Tigernet.Hosting.Attributes.HttpMethods.Commons;
 using Tigernet.Hosting.Attributes.Resters;
 using Tigernet.Hosting.Exceptions;
+using JsonConverter = System.Text.Json.Serialization.JsonConverter;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Tigernet.Hosting
 {
@@ -210,7 +214,7 @@ namespace Tigernet.Hosting
                     rester = Activator.CreateInstance(resterType);
                 }
 
-                var args = GetArguments(method, context);
+                var args = await GetArguments(method, context);
                 var result = method.Invoke(rester, args);
 
                 if (result is Task task)
@@ -228,7 +232,7 @@ namespace Tigernet.Hosting
             };
         }
 
-        private object[] GetArguments(MethodInfo method, HttpListenerContext context)
+        private async ValueTask<object[]> GetArguments(MethodInfo method, HttpListenerContext context)
         {
             var parameters = method.GetParameters();
             var args = new object[parameters.Length];
@@ -244,9 +248,33 @@ namespace Tigernet.Hosting
                 {
                     args[i] = null;
                 }
+
+                var content = await GetRequestContentAsync(context.Request, parameterType);
+                if (content != default)
+                    args[i] = content;
             }
 
             return args;
+        }
+
+        private async ValueTask<object?> GetRequestContentAsync(HttpListenerRequest request, Type expectedType)
+        {
+            if (request.ContentLength64 == 0)
+                return null;
+
+            using var reader = new StreamReader(request.InputStream);
+            var content = await reader.ReadToEndAsync();
+            var result = default(object);
+            try
+            {
+                result = JsonConvert.DeserializeObject(content, expectedType);
+            }
+            catch (Exception exception)
+            {
+                // TODO: Log exception
+            }
+
+            return result;
         }
     }
 }
