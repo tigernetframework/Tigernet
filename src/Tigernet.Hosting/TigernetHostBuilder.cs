@@ -152,7 +152,7 @@ namespace Tigernet.Hosting
             foreach (var resterType in resterTypes)
             {
                 var methods = resterType.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                    .Where(m => m.GetCustomAttribute<GetterAttribute>() != null || m.GetCustomAttribute<PosterAttribute>() != null);
+                    .Where(m => m.GetCustomAttribute<GetterAttribute>() != null || m.GetCustomAttribute<PosterAttribute>() != null || m.GetCustomAttribute<PatcherAttribute>() != null);
 
                 var typeName = resterType.Name;
 
@@ -160,6 +160,7 @@ namespace Tigernet.Hosting
                 {
                     var getterAttr = method.GetCustomAttribute<GetterAttribute>();
                     var posterAttr = method.GetCustomAttribute<PosterAttribute>();
+                    var patcherAttr = method.GetCustomAttribute<PatcherAttribute>();
 
                     var endpointAttr = getterAttr != null ? getterAttr : (HttpMethodAttribute)posterAttr;
 
