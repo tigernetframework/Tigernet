@@ -1,6 +1,4 @@
-﻿using Tigernet.Hosting.Attributes.HttpMethods.Commons;
-
-namespace Tigernet.Hosting.Attributes.HttpMethods;
+﻿namespace Tigernet.Hosting.Attributes.HttpMethods;
 
 /// <summary>
 /// The `GetterAttribute` class is used to represent a GET HTTP method.

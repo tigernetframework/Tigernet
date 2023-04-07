@@ -42,5 +42,18 @@ namespace Tigernet.Samples.RestApi.Resters
 
             return Ok(userClever.Add(user));
         }
+
+        [Putter("/update")]
+        public object Put()
+        {
+            User user = new User()
+            {
+                Id = 7,
+                Name = "Ali",
+                Age = 28
+            };
+            
+            return Ok(userClever.Update(user.Id, user));
+        }
     }
 }

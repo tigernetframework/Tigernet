@@ -56,5 +56,17 @@ namespace Tigernet.Samples.RestApi.Clevers
 
             return user;
         }
+
+        public User Update(int userId, User user)
+        {
+            var existedUser = users.FirstOrDefault(u => u.Id == userId);
+            if (existedUser is null)
+                return null;
+
+            existedUser = user;
+            existedUser.Id = userId;
+
+            return existedUser;
+        }
     }
 }
