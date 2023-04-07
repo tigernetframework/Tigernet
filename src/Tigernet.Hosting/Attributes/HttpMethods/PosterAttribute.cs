@@ -1,6 +1,4 @@
-﻿using Tigernet.Hosting.Attributes.HttpMethods.Commons;
-
-namespace Tigernet.Hosting.Attributes.HttpMethods;
+﻿namespace Tigernet.Hosting.Attributes.HttpMethods;
 
 /// <summary>
 /// The `PosterAttribute` class is used to represent a POST HTTP method.
