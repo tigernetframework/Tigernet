@@ -1,6 +1,4 @@
-﻿using Tigernet.Hosting.Models.Query;
-
-namespace Tigernet.Hosting.Models.Common
+﻿namespace Tigernet.Hosting.Models.Common
 {
     /// <summary>
     /// Defines queryable entity

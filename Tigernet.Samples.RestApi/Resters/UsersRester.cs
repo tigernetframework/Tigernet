@@ -52,7 +52,7 @@ namespace Tigernet.Samples.RestApi.Resters
                 Name = "Ali",
                 Age = 28
             };
-            
+
             return Ok(userClever.Update(user.Id, user));
         }
     }
