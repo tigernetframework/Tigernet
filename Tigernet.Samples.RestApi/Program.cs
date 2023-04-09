@@ -4,7 +4,7 @@ using Tigernet.Samples.RestApi.Clevers.Interfaces;
 
 var builder = new TigernetHostBuilder("http://localhost:5000/");
 
-builder.AddService<IUserClever, UserClever>();
+builder.AddService<IUserEntityManager, UserEntityManager>();
 
 builder.MapResters();
 

@@ -1,7 +1,7 @@
 ﻿using Tigernet.Hosting.Actions;
 using Tigernet.Hosting.Attributes.HttpMethods;
 using Tigernet.Hosting.Attributes.Resters;
-using Tigernet.Hosting.Models.Query;
+using Tigernet.Hosting.DataAccess.Query;
 using Tigernet.Samples.RestApi.Clevers.Interfaces;
 using Tigernet.Samples.RestApi.Models;
 
@@ -10,23 +10,23 @@ namespace Tigernet.Samples.RestApi.Resters
     [ApiRester]
     public class UsersRester : ResterBase
     {
-        private readonly IUserClever userClever;
+        private readonly IUserEntityManager _userEntityManager;
 
-        public UsersRester(IUserClever userClever)
+        public UsersRester(IUserEntityManager userEntityManager)
         {
-            this.userClever = userClever;
+            this._userEntityManager = userEntityManager;
         }
 
         [Poster("/by-filter")]
         public async ValueTask<object> GetByFilter(EntityQueryOptions<User> model)
         {
-            return Ok(await userClever.GetAsync(model));
+            return Ok(await _userEntityManager.GetAsync(model));
         }
 
         [Getter]
         public async ValueTask<object> Get()
         {
-            var result = await userClever.GetByIdAsync(1);
+            var result = await _userEntityManager.GetByIdAsync(1);
             return Ok(result);
         }
 
@@ -40,7 +40,7 @@ namespace Tigernet.Samples.RestApi.Resters
                 Age = 28
             };
 
-            return Ok(userClever.Add(user));
+            return Ok(_userEntityManager.Add(user));
         }
 
         [Putter("/update")]
@@ -53,7 +53,7 @@ namespace Tigernet.Samples.RestApi.Resters
                 Age = 28
             };
             
-            return Ok(userClever.Update(user.Id, user));
+            return Ok(_userEntityManager.Update(user));
         }
     }
 }
