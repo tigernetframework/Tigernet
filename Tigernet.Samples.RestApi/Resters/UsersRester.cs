@@ -1,8 +1,10 @@
 ﻿using Tigernet.Hosting.Actions;
 using Tigernet.Hosting.Attributes.HttpMethods;
 using Tigernet.Hosting.Attributes.Resters;
-using Tigernet.Samples.RestApi.Abstractions;
+using Tigernet.Hosting.Models.Query;
+using Tigernet.Samples.RestApi.Clevers.Interfaces;
 using Tigernet.Samples.RestApi.Models;
+
 namespace Tigernet.Samples.RestApi.Resters
 {
     [ApiRester]
@@ -15,17 +17,17 @@ namespace Tigernet.Samples.RestApi.Resters
             this.userClever = userClever;
         }
 
-
-        [Getter("/all")]
-        public object GetAll()
+        [Poster("/by-filter")]
+        public async ValueTask<object> GetByFilter(EntityQueryOptions<User> model)
         {
-            return Ok(userClever.GetAll());
+            return Ok(await userClever.GetAsync(model));
         }
 
         [Getter]
-        public object Get()
+        public async ValueTask<object> Get()
         {
-            return Ok(userClever.Get(1));
+            var result = await userClever.GetByIdAsync(1);
+            return Ok(result);
         }
 
         [Poster("/new")]
@@ -36,10 +38,22 @@ namespace Tigernet.Samples.RestApi.Resters
                 Id = 7,
                 Name = "Ikrom",
                 Age = 28
-
             };
 
             return Ok(userClever.Add(user));
+        }
+
+        [Putter("/update")]
+        public object Put()
+        {
+            User user = new User()
+            {
+                Id = 7,
+                Name = "Ali",
+                Age = 28
+            };
+
+            return Ok(userClever.Update(user.Id, user));
         }
     }
 }

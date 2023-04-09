@@ -1,183 +1,211 @@
-﻿using System.Data;
+using Newtonsoft.Json;
+using System.Data;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using Tigernet.Hosting.Attributes.Commons;
+using System.Text.Json;
 using Tigernet.Hosting.Attributes.HttpMethods;
 using Tigernet.Hosting.Attributes.Resters;
 using Tigernet.Hosting.Exceptions;
 
-namespace Tigernet.Hosting
+namespace Tigernet.Hosting;
+
+#pragma warning disable
+/// <summary>
+/// The TigernetHostBuilder is a class used to create and host a web server with a given prefix.
+/// It utilizes the HttpListener class from the .NET framework to listen for incoming requests and routes them to their respective handlers.
+/// The class provides a MapRoute method that maps a route URL to its corresponding request handler, which is a function that takes in an HttpListenerContext and returns a task.
+/// It also provides a MapRester method that maps a route URL to a REST API endpoint using the ResterBase class.
+/// The ResterBase class is a base class for creating REST APIs, and it uses custom attributes to identify the endpoint URLs.
+/// The Start method is used to start the web server and listen for incoming requests.
+/// </summary>
+public partial class TigernetHostBuilder
 {
     /// <summary>
-    /// The TigernetHostBuilder is a class used to create and host a web server with a given prefix.
-    /// It utilizes the HttpListener class from the .NET framework to listen for incoming requests and routes them to their respective handlers.
-    /// The class provides a MapRoute method that maps a route URL to its corresponding request handler, which is a function that takes in an HttpListenerContext and returns a task.
-    /// It also provides a MapRester method that maps a route URL to a REST API endpoint using the ResterBase class.
-    /// The ResterBase class is a base class for creating REST APIs, and it uses custom attributes to identify the endpoint URLs.
-    /// The Start method is used to start the web server and listen for incoming requests.
+    /// A readonly field for storing the prefix for the HTTP listener.
     /// </summary>
-    public partial class TigernetHostBuilder
+    private readonly string _prefix;
+
+    /// <summary>
+    /// An instance of HttpListener to listen for incoming requests.
+    /// </summary>
+    private readonly HttpListener _listener = new HttpListener();
+
+    /// <summary>
+    /// A dictionary to store the routes and their associated handlers functions.
+    /// </summary>
+    private readonly Dictionary<string, Func<HttpListenerContext, Task>> _routes = new Dictionary<string, Func<HttpListenerContext, Task>>();
+
+    /// <summary>
+    /// A list of middleware functions.
+    /// </summary>
+    internal readonly List<Func<HttpListenerContext, Task>> _middlewares = new List<Func<HttpListenerContext, Task>>();
+
+    /// <summary>
+    /// Constructor for TigernetHostBuilder class. It takes in a string prefix and sets it as the prefix for the HttpListener.
+    /// </summary>
+    /// <param name="prefix">The prefix for the HttpListener</param>
+    public TigernetHostBuilder()
     {
-        /// <summary>
-        /// A readonly field for storing the prefix for the HTTP listener.
-        /// </summary>
-        private readonly string _prefix;
+        _prefix = GetPrefix();
+        _listener.Prefixes.Add(_prefix);
+        _services = new Dictionary<Type, Type>();
+    }
 
-        /// <summary>
-        /// An instance of HttpListener to listen for incoming requests.
-        /// </summary>
-        private readonly HttpListener _listener = new HttpListener();
+    /// <summary>
+    /// Method used to map a route to a specific handler function.
+    /// </summary>
+    /// <param name="route">The route to be mapped</param>
+    /// <param name="handler">The handler function to be associated with the route</param>
+    public void MapRoute(string route, Func<HttpListenerContext, Task> handler)
+    {
+        // check for exist of route
+        if (_routes.ContainsKey(route))
+            throw new RouteDuplicatedException(route);
 
-        /// <summary>
-        /// A dictionary to store the routes and their associated handlers functions.
-        /// </summary>
-        private readonly Dictionary<string, Func<HttpListenerContext, Task>> _routes = new Dictionary<string, Func<HttpListenerContext, Task>>();
+        _routes.Add(route, handler);
+    }
 
-        /// <summary>
-        /// A list of middleware functions.
-        /// </summary>
-        internal readonly List<Func<HttpListenerContext, Task>> _middlewares = new List<Func<HttpListenerContext, Task>>();
-
-        /// <summary>
-        /// Constructor for TigernetHostBuilder class. It takes in a string prefix and sets it as the prefix for the HttpListener.
-        /// </summary>
-        /// <param name="prefix">The prefix for the HttpListener</param>
-        public TigernetHostBuilder(string prefix)
+    /// <summary>
+    /// Start method starts the HTTP listener and listens for incoming requests.
+    /// It writes a message in the console indicating the server is running on the specified prefix.
+    /// The method uses an infinite loop to keep listening for incoming requests and handle them using the HandleRequest method.
+    /// </summary>
+    public async Task Start()
+    {
+        _listener.Start();
+        Console.WriteLine("Server is running on " + _prefix);
+        while (true)
         {
-            _prefix = prefix;
-            _listener.Prefixes.Add(prefix);
-            _services = new Dictionary<Type, Type>();
+            var context = await _listener.GetContextAsync();
+            await HandleRequestAsync(context);
         }
+    }
 
-        /// <summary>
-        /// Method used to map a route to a specific handler function.
-        /// </summary>
-        /// <param name="route">The route to be mapped</param>
-        /// <param name="handler">The handler function to be associated with the route</param>
-        public void MapRoute(string route, Func<HttpListenerContext, Task> handler)
+    /// <summary>
+    /// HandleRequest method handles the incoming request by looking for a matching route in the routes dictionary.
+    /// If a matching route is found, it invokes the associated handler.
+    /// If there is no matching route, it sets the response status code to "Not Found" and closes the response.
+    /// </summary>
+    /// <param name="context">The HttpListenerContext representing the incoming request and response</param>
+    private async Task HandleRequestAsync(HttpListenerContext context)
+    {
+        // get the route from the request URL
+        // apply _middlewares to the request and response here
+        var request = context.Request;
+        var response = context.Response;
+
+        // check middleware is exist
+        if (_middlewares.Any())
         {
-            // check for exist of route
-            if (_routes.ContainsKey(route))
-                throw new RouteDuplicatedException(route);
-
-            _routes.Add(route, handler);
-        }
-
-        /// <summary>
-        /// Start method starts the HTTP listener and listens for incoming requests.
-        /// It writes a message in the console indicating the server is running on the specified prefix.
-        /// The method uses an infinite loop to keep listening for incoming requests and handle them using the HandleRequest method.
-        /// </summary>
-        public async Task Start()
-        {
-            _listener.Start();
-            Console.WriteLine("Server is running on " + _prefix);
-            while (true)
+            foreach (var next in _middlewares)
             {
-                var context = await _listener.GetContextAsync();
-                await HandleRequestAsync(context);
-            }
-        }
-
-        /// <summary>
-        /// HandleRequest method handles the incoming request by looking for a matching route in the routes dictionary.
-        /// If a matching route is found, it invokes the associated handler.
-        /// If there is no matching route, it sets the response status code to "Not Found" and closes the response.
-        /// </summary>
-        /// <param name="context">The HttpListenerContext representing the incoming request and response</param>
-        private async Task HandleRequestAsync(HttpListenerContext context)
-        {
-            // get the route from the request URL
-            // apply _middlewares to the request and response here
-            var request = context.Request;
-            var response = context.Response;
-
-            // check middleware is exist
-            if (_middlewares.Any())
-            {
-                foreach (var next in _middlewares)
+                // check route is exist
+                if (!_routes.ContainsKey(request.Url.AbsolutePath))
                 {
-                    // check route is exist
-                    if (!_routes.ContainsKey(request.Url.AbsolutePath))
-                    {
-                        response.StatusCode = (int)HttpStatusCode.NotFound;
-                        response.Close();
+                    response.StatusCode = (int)HttpStatusCode.NotFound;
+                    response.Close();
 
-                        return;
-                    }
-                    else
-                    {
-                        await next(context);
-                    }
+                    return;
+                }
+                else
+                {
+                    await next(context);
                 }
             }
+        }
 
-            // if middleware is not exist
-            Func<HttpListenerContext, Task> handler;
-            if (_routes.TryGetValue(request.RawUrl, out handler))
+        // if middleware is not exist
+        Func<HttpListenerContext, Task> handler;
+        if (_routes.TryGetValue(request.RawUrl, out handler))
+        {
+            await handler(context);
+        }
+        else
+        {
+            response.StatusCode = (int)HttpStatusCode.NotFound;
+            response.Close();
+        }
+    }
+
+    /// <summary>
+    /// Using middleware
+    /// </summary>
+    /// <param name="middleware"></param>
+    /// <returns></returns>
+    public TigernetHostBuilder UseAsync(Func<HttpListenerContext, Task> middleware)
+    {
+        _middlewares.Add(middleware);
+
+        return this;
+    }
+
+    public void MapResters()
+    {
+        // get the assembly that is using this library
+        var assembly = Assembly.GetCallingAssembly();
+
+        // get all types in the assembly
+        var types = assembly.GetTypes();
+
+        // filter for types that have the ApiRester attribute
+        var resterTypes = types.Where(t => t.GetCustomAttribute<ApiResterAttribute>() != null);
+
+        foreach (var resterType in resterTypes)
+        {
+            var methods = resterType.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .Where(m => m.GetCustomAttribute<HttpMethodAttribute>() != null);
+
+            var typeName = resterType.Name;
+
+            foreach (var method in methods)
             {
-                await handler(context);
+                var getterAttr = method.GetCustomAttribute<GetterAttribute>();
+                var posterAttr = method.GetCustomAttribute<PosterAttribute>();
+                var patcherAttr = method.GetCustomAttribute<PatcherAttribute>();
+                var putterAttr = method.GetCustomAttribute<PutterAttribute>();
+
+                HttpMethodAttribute? endpointAttr = GetValidatedMethodAttributes(new HttpMethodAttribute[]
+                {
+                    getterAttr, posterAttr, patcherAttr, putterAttr
+                });
+
+                var route = Path.Combine("/", typeName.Split(new[] { "Rester" },
+                        StringSplitOptions.None).FirstOrDefault());
+
+                var routeUrl = (route + endpointAttr.route).ToLower();
+
+                var handler = CreateHandlerFunc(resterType, method, endpointAttr);
+
+                MapRoute(routeUrl, handler);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Retrieves a validated HttpMethodAttribute from an array of HttpMethodAttributes.
+    /// </summary>
+    /// <param name="httpMethodAttributes">An array of HttpMethodAttributes.</param>
+    /// <returns>The validated HttpMethodAttribute.</returns>
+    /// <exception cref="ArgumentException">Thrown when the array of HttpMethodAttributes contains invalid usage.</exception>
+    HttpMethodAttribute? GetValidatedMethodAttributes(HttpMethodAttribute?[] httpMethodAttributes)
+    {
+        if (httpMethodAttributes.Count(a => a != null) != 1)
+            throw new ArgumentException("Invalid usage http method attributes");
+
+        return httpMethodAttributes.FirstOrDefault(a => a != null);
+    }
+
+    private Func<HttpListenerContext, Task> CreateHandlerFunc(Type resterType, MethodInfo method, HttpMethodAttribute attribute)
+    {
+        return async context =>
+        {
+            if (context.Request.HttpMethod != attribute.HttpMethodName)
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                context.Response.Close();
             }
             else
-            {
-                response.StatusCode = (int)HttpStatusCode.NotFound;
-                response.Close();
-            }
-        }
-
-        /// <summary>
-        /// Using middleware
-        /// </summary>
-        /// <param name="middleware"></param>
-        /// <returns></returns>
-        public TigernetHostBuilder UseAsync(Func<HttpListenerContext, Task> middleware)
-        {
-            _middlewares.Add(middleware);
-
-            return this;
-        }
-
-        public void MapResters()
-        {
-            // get the assembly that is using this library
-            var assembly = Assembly.GetCallingAssembly();
-
-            // get all types in the assembly
-            var types = assembly.GetTypes();
-
-            // filter for types that have the ApiRester attribute
-            var resterTypes = types.Where(t => t.GetCustomAttribute<ApiResterAttribute>() != null);
-
-            foreach (var resterType in resterTypes)
-            {
-                var methods = resterType.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                    .Where(m => m.GetCustomAttribute<GetterAttribute>() != null || m.GetCustomAttribute<PosterAttribute>() != null);
-
-                var typeName = resterType.Name;
-
-                foreach (var method in methods)
-                {
-                    var getterAttr = method.GetCustomAttribute<GetterAttribute>();
-                    var posterAttr = method.GetCustomAttribute<PosterAttribute>();
-
-                    var endpointAttr = getterAttr != null ? getterAttr : (HttpMethodAttribute)posterAttr;
-
-                    var route = Path.Combine("/", typeName.Split(new[] { "Rester" },
-                            StringSplitOptions.None).FirstOrDefault());
-
-                    var routeUrl = (route + endpointAttr.route).ToLower();
-
-                    var handler = CreateHandlerFunc(resterType, method);
-
-                    MapRoute(routeUrl, handler);
-                }
-            }
-        }
-
-        private Func<HttpListenerContext, Task> CreateHandlerFunc(Type resterType, MethodInfo method)
-        {
-            return async context =>
             {
                 object rester;
                 var constructor = resterType.GetConstructors().FirstOrDefault();
@@ -197,7 +225,8 @@ namespace Tigernet.Hosting
                         }
                         else
                         {
-                            throw new Exception($"Unable to resolve service of type {parameterType} for constructor of {resterType}.");
+                            throw new Exception(
+                                $"Unable to resolve service of type {parameterType} for constructor of {resterType}.");
                         }
                     }
 
@@ -208,7 +237,7 @@ namespace Tigernet.Hosting
                     rester = Activator.CreateInstance(resterType);
                 }
 
-                var args = GetArguments(method, context);
+                var args = await GetArguments(method, context);
                 var result = method.Invoke(rester, args);
 
                 if (result is Task task)
@@ -223,28 +252,73 @@ namespace Tigernet.Hosting
                 {
                     await output.WriteAsync(content, 0, content.Length);
                 }
-            };
-        }
+            }
+        };
+    }
 
-        private object[] GetArguments(MethodInfo method, HttpListenerContext context)
+    private async ValueTask<object[]> GetArguments(MethodInfo method, HttpListenerContext context)
+    {
+        var parameters = method.GetParameters();
+        var args = new object[parameters.Length];
+
+        for (int i = 0; i < parameters.Length; i++)
         {
-            var parameters = method.GetParameters();
-            var args = new object[parameters.Length];
-
-            for (int i = 0; i < parameters.Length; i++)
+            var parameterType = parameters[i].ParameterType;
+            if (parameterType == typeof(HttpListenerContext))
             {
-                var parameterType = parameters[i].ParameterType;
-                if (parameterType == typeof(HttpListenerContext))
-                {
-                    args[i] = context;
-                }
-                else
-                {
-                    args[i] = null;
-                }
+                args[i] = context;
+            }
+            else
+            {
+                args[i] = null;
             }
 
-            return args;
+            var content = await GetRequestContentAsync(context.Request, parameterType);
+            if (content != default)
+                args[i] = content;
         }
+
+        return args;
+    }
+
+    private async ValueTask<object?> GetRequestContentAsync(HttpListenerRequest request, Type expectedType)
+    {
+        if (request.ContentLength64 == 0)
+            return null;
+
+        using var reader = new StreamReader(request.InputStream);
+        var content = await reader.ReadToEndAsync();
+        var result = default(object);
+        try
+        {
+            result = JsonConvert.DeserializeObject(content, expectedType);
+        }
+        catch (Exception exception)
+        {
+            // TODO: Log exception
+        }
+
+        return result;
+    }
+
+    private string GetPrefix()
+    {
+        // get the assembly that is using this library
+        var assembly = Assembly.GetCallingAssembly();
+
+        // Set the path of the file within the project
+        string filePath = @"../../../Properties/launchSettings.json";
+
+        // Read the contents of the file
+        string launchSettingsJson = File.ReadAllText(filePath);
+
+        // Parse the JSON string into a JsonDocument object
+        JsonDocument launchSettingsDoc = JsonDocument.Parse(launchSettingsJson);
+
+        // Navigate the JSON object to get the desired value
+        JsonElement applicationUrlElement = launchSettingsDoc.RootElement
+            .GetProperty("applicationUrl");
+
+        return applicationUrlElement.GetString();
     }
 }
