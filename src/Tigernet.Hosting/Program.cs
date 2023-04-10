@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Tigernet.Hosting;
 
-TigernetHostBuilder host = new TigernetHostBuilder("http://localhost:5001/");
+TigernetHostBuilder host = new TigernetHostBuilder();
 
 // add route to the host
 host.MapRoute("/", async context =>
