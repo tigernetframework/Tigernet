@@ -1,5 +1,6 @@
 ﻿using Tigernet.Hosting.Actions;
 using Tigernet.Hosting.Attributes.HttpMethods;
+using Tigernet.Hosting.Attributes.RequestContents;
 using Tigernet.Hosting.Attributes.Resters;
 using Tigernet.Hosting.Models.Query;
 using Tigernet.Samples.RestApi.Clevers.Interfaces;
@@ -24,22 +25,15 @@ namespace Tigernet.Samples.RestApi.Resters
         }
 
         [Getter]
-        public async ValueTask<object> Get()
+        public async ValueTask<object> Get([FromBody] int id)
         {
-            var result = await userClever.GetByIdAsync(1);
+            var result = await userClever.GetByIdAsync(id);
             return Ok(result);
         }
 
         [Poster("/new")]
-        public object Add()
+        public object Add([FromBody] User user)
         {
-            User user = new User()
-            {
-                Id = 7,
-                Name = "Ikrom",
-                Age = 28
-            };
-
             return Ok(userClever.Add(user));
         }
 
