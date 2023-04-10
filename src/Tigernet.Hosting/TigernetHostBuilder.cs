@@ -1,18 +1,17 @@
+using Newtonsoft.Json;
 using System.Data;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using System.Text.Json.Serialization;
-using Newtonsoft.Json;
+using System.Text.Json;
 using Tigernet.Hosting.Attributes.HttpMethods;
 using Tigernet.Hosting.Attributes.RequestContents;
 using Tigernet.Hosting.Attributes.Resters;
 using Tigernet.Hosting.Exceptions;
-using Tigernet.Hosting.Extensions;
 using JsonConverter = System.Text.Json.Serialization.JsonConverter;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace Tigernet.Hosting; 
+namespace Tigernet.Hosting;
 
 #pragma warning disable
 /// <summary>
@@ -49,10 +48,10 @@ public partial class TigernetHostBuilder
     /// Constructor for TigernetHostBuilder class. It takes in a string prefix and sets it as the prefix for the HttpListener.
     /// </summary>
     /// <param name="prefix">The prefix for the HttpListener</param>
-    public TigernetHostBuilder(string prefix)
+    public TigernetHostBuilder()
     {
-        _prefix = prefix;
-        _listener.Prefixes.Add(prefix);
+        _prefix = GetPrefix();
+        _listener.Prefixes.Add(_prefix);
         _services = new Dictionary<Type, Type>();
     }
 
@@ -168,10 +167,11 @@ public partial class TigernetHostBuilder
                 var posterAttr = method.GetCustomAttribute<PosterAttribute>();
                 var patcherAttr = method.GetCustomAttribute<PatcherAttribute>();
                 var putterAttr = method.GetCustomAttribute<PutterAttribute>();
+                var deleterAttr = method.GetCustomAttribute<DeleterAttribute>();
 
                 HttpMethodAttribute? endpointAttr = GetValidatedMethodAttributes(new HttpMethodAttribute[]
                 {
-                    getterAttr, posterAttr, patcherAttr, putterAttr
+                    getterAttr, posterAttr, patcherAttr, putterAttr, deleterAttr
                 });
 
                 var route = Path.Combine("/", typeName.Split(new[] { "Rester" },
@@ -185,7 +185,7 @@ public partial class TigernetHostBuilder
             }
         }
     }
-    
+
     /// <summary>
     /// Retrieves a validated HttpMethodAttribute from an array of HttpMethodAttributes.
     /// </summary>
@@ -329,5 +329,26 @@ public partial class TigernetHostBuilder
         }
 
         return result;
+    }
+
+    private string GetPrefix()
+    {
+        // get the assembly that is using this library
+        var assembly = Assembly.GetCallingAssembly();
+
+        // Set the path of the file within the project
+        string filePath = @"../../../Properties/launchSettings.json";
+
+        // Read the contents of the file
+        string launchSettingsJson = File.ReadAllText(filePath);
+
+        // Parse the JSON string into a JsonDocument object
+        JsonDocument launchSettingsDoc = JsonDocument.Parse(launchSettingsJson);
+
+        // Navigate the JSON object to get the desired value
+        JsonElement applicationUrlElement = launchSettingsDoc.RootElement
+            .GetProperty("applicationUrl");
+
+        return applicationUrlElement.GetString();
     }
 }

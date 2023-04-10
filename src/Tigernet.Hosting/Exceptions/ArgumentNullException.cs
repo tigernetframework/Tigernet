@@ -6,5 +6,5 @@ public class ArgumentNullException : Exception
         : base($"The argument '{argumentName}' cannot be null, please provide a valid input!")
     {
     }
-
+    
 }

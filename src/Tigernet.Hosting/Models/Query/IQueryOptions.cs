@@ -1,6 +1,4 @@
-﻿using Tigernet.Hosting.Models.Query;
-
-namespace Tigernet.Hosting.Models.Query;
+﻿namespace Tigernet.Hosting.Models.Query;
 
 /// <summary>
 /// Defines properties for queryable source query options

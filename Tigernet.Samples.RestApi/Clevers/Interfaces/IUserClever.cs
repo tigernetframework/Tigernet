@@ -7,4 +7,5 @@ public interface IUserClever : ICleverBase<User, int>
 {
     User Add(User user);
     User Update(int userId, User user);
+    bool Delete(int userId);
 }

@@ -28,6 +28,7 @@ namespace Tigernet.Samples.RestApi.Resters
         public async ValueTask<object> Get([FromBody] int id)
         {
             var result = await userClever.GetByIdAsync(id);
+
             return Ok(result);
         }
 
@@ -46,8 +47,15 @@ namespace Tigernet.Samples.RestApi.Resters
                 Name = "Ali",
                 Age = 28
             };
-            
+
             return Ok(userClever.Update(user.Id, user));
+        }
+
+        [Deleter("/delete")]
+        public object Delete(int userUd)
+        {
+            var res = userClever.Delete(7);
+            return Ok(res);
         }
     }
 }
