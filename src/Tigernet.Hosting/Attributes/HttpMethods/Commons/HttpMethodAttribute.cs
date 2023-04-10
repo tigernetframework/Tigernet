@@ -1,4 +1,4 @@
-﻿namespace Tigernet.Hosting.Attributes.HttpMethods.Commons;
+﻿namespace Tigernet.Hosting.Attributes.HttpMethods;
 
 /// <summary>
 /// Identifies an action that supports a given set of HTTP methods.

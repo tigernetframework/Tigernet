@@ -26,7 +26,7 @@ namespace Tigernet.Samples.RestApi.Resters
         [Getter]
         public async ValueTask<object> Get()
         {
-            var result = await userClever.GetByIdAsync(1);
+            var result = await userClever.GetByIdAsync(7);
             return Ok(result);
         }
 
@@ -36,11 +36,31 @@ namespace Tigernet.Samples.RestApi.Resters
             User user = new User()
             {
                 Id = 7,
-                Name = "Ikrom",
+                Name = "Sardor",
                 Age = 28
             };
 
             return Ok(userClever.Add(user));
+        }
+
+        [Putter("/update")]
+        public object Put()
+        {
+            User user = new User()
+            {
+                Id = 7,
+                Name = "Ali",
+                Age = 28
+            };
+            
+            return Ok(userClever.Update(user.Id, user));
+        }
+
+        [Deleter("/delete")]
+        public object Delete(int userUd)
+        {
+            var res = userClever.Delete(7);
+            return Ok(res);
         }
     }
 }

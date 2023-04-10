@@ -43,7 +43,7 @@ namespace Tigernet.Samples.RestApi.Clevers
                 Id = 6,
                 Name = "Sabohat",
                 Age = 23
-            },
+            }
         };
 
         public UserClever() : base(users.AsQueryable())
@@ -55,6 +55,33 @@ namespace Tigernet.Samples.RestApi.Clevers
             users.Add(user);
 
             return user;
+        }
+        
+
+        public User Update(int userId, User user)
+        {
+            var existedUser = users.FirstOrDefault(u => u.Id == userId);
+            if (existedUser is null)
+                return null;
+
+            existedUser = user;
+            existedUser.Id = userId;
+
+            return existedUser;
+        }
+
+        public bool Delete(int userId)
+        {
+            var userToDelete = users.FirstOrDefault(u => u.Id == userId);
+            if (userToDelete != null)
+            {
+                users.Remove(userToDelete);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
