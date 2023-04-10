@@ -1,6 +1,4 @@
-﻿using Tigernet.Hosting.Attributes.HttpMethods.Commons;
-using Tigernet.Hosting.Exceptions;
-using ArgumentNullException = Tigernet.Hosting.Exceptions.ArgumentNullException;
+﻿
 
 namespace Tigernet.Hosting.Attributes.HttpMethods
 {
@@ -9,12 +7,14 @@ namespace Tigernet.Hosting.Attributes.HttpMethods
     /// </summary>
     public class DeleterAttribute : HttpMethodAttribute
     {
+        /// <inheritdoc />
         public DeleterAttribute(string route = null)
             : base(route)
         {
             
         }
         
+        /// <inheritdoc />
         internal override string HttpMethodName
         {
             get => "DELETE";

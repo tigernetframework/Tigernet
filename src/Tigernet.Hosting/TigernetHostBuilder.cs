@@ -166,10 +166,11 @@ public partial class TigernetHostBuilder
                 var posterAttr = method.GetCustomAttribute<PosterAttribute>();
                 var patcherAttr = method.GetCustomAttribute<PatcherAttribute>();
                 var putterAttr = method.GetCustomAttribute<PutterAttribute>();
+                var deleterAttr = method.GetCustomAttribute<DeleterAttribute>();
 
                 HttpMethodAttribute? endpointAttr = GetValidatedMethodAttributes(new HttpMethodAttribute[]
                 {
-                    getterAttr, posterAttr, patcherAttr, putterAttr
+                    getterAttr, posterAttr, patcherAttr, putterAttr, deleterAttr
                 });
 
                 var route = Path.Combine("/", typeName.Split(new[] { "Rester" },

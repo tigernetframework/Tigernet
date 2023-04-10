@@ -23,17 +23,10 @@ namespace Tigernet.Samples.RestApi.Resters
             return Ok(await userClever.GetAsync(model));
         }
 
-        [Deleter("/user-remove")]
-        public async ValueTask<object> Remove()
-        {
-            var res =  userClever.Delete(2);
-            return Ok(res);
-        }
-
         [Getter]
         public async ValueTask<object> Get()
         {
-            var result = await userClever.GetByIdAsync(1);
+            var result = await userClever.GetByIdAsync(7);
             return Ok(result);
         }
 
@@ -43,7 +36,7 @@ namespace Tigernet.Samples.RestApi.Resters
             User user = new User()
             {
                 Id = 7,
-                Name = "Ikrom",
+                Name = "Sardor",
                 Age = 28
             };
 
@@ -61,6 +54,13 @@ namespace Tigernet.Samples.RestApi.Resters
             };
             
             return Ok(userClever.Update(user.Id, user));
+        }
+
+        [Deleter("/delete")]
+        public object Delete(int userUd)
+        {
+            var res = userClever.Delete(7);
+            return Ok(res);
         }
     }
 }
