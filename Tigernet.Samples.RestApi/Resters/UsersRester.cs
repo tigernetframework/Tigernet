@@ -23,6 +23,13 @@ namespace Tigernet.Samples.RestApi.Resters
             return Ok(await userClever.GetAsync(model));
         }
 
+        [Deleter("/user-remove")]
+        public async ValueTask<object> Remove()
+        {
+            var res =  userClever.Delete(2);
+            return Ok(res);
+        }
+
         [Getter]
         public async ValueTask<object> Get()
         {
