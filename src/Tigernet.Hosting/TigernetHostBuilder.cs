@@ -8,6 +8,7 @@ using Tigernet.Hosting.Attributes.HttpMethods;
 using Tigernet.Hosting.Attributes.RequestContents;
 using Tigernet.Hosting.Attributes.Resters;
 using Tigernet.Hosting.Exceptions;
+using Tigernet.Hosting.Extensions;
 using JsonConverter = System.Text.Json.Serialization.JsonConverter;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
