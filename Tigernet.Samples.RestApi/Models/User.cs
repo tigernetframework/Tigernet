@@ -1,5 +1,5 @@
 ﻿using Tigernet.Hosting.Attributes.Query;
-using Tigernet.Hosting.DataAccess.Entity;
+using Tigernet.Hosting.DataAccess.Models.Entity;
 
 namespace Tigernet.Samples.RestApi.Models
 {

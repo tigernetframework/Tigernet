@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="DataAccess\Models\" />
     <Folder Include="Extensions\" />
   </ItemGroup>
 

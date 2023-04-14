@@ -1,4 +1,7 @@
-﻿namespace Tigernet.Hosting
+﻿using Tigernet.Hosting.DataAccess.Brokers;
+using Tigernet.Hosting.DataAccess.Services;
+
+namespace Tigernet.Hosting
 {
     public partial class TigernetHostBuilder
     {
@@ -15,6 +18,25 @@
         public void AddService<T, TImpl>() where TImpl : T
         {
             _services[typeof(T)] = typeof(TImpl);
+        }
+
+        public void AddDataSourceProvider<TInterface, TImplementation>() where TImplementation : class, IDataSourceBroker, new()
+        {
+            _services[typeof(TInterface)] = typeof(TImplementation);
+
+            // TODO : Optimize
+            // Registering entity manager services
+            var entityTypes = new TImplementation().GetEntityTypes();
+
+            var serviceType = typeof(IEntityManagerBaseService<>);
+            var targetType = typeof(EntityManagerBaseService<>);
+
+            foreach (var entityType in entityTypes)
+            {
+                var specificInterface = serviceType.MakeGenericType(entityType);
+                var specificImplementation = targetType.MakeGenericType(entityType);
+                _services[specificInterface] = specificImplementation;
+            }
         }
 
         /// <summary>

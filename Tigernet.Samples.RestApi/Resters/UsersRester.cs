@@ -1,8 +1,8 @@
 ﻿using Tigernet.Hosting.Actions;
 using Tigernet.Hosting.Attributes.HttpMethods;
 using Tigernet.Hosting.Attributes.Resters;
-using Tigernet.Hosting.DataAccess.Query;
-using Tigernet.Samples.RestApi.Clevers.Interfaces;
+using Tigernet.Hosting.DataAccess.Models.Query;
+using Tigernet.Hosting.DataAccess.Services;
 using Tigernet.Samples.RestApi.Models;
 
 namespace Tigernet.Samples.RestApi.Resters
@@ -10,11 +10,11 @@ namespace Tigernet.Samples.RestApi.Resters
     [ApiRester]
     public class UsersRester : ResterBase
     {
-        private readonly IUserEntityManager _userEntityManager;
+        private readonly IEntityManagerBaseService<User> _userEntityManager;
 
-        public UsersRester(IUserEntityManager userEntityManager)
+        public UsersRester(IEntityManagerBaseService<User> userEntityManager)
         {
-            this._userEntityManager = userEntityManager;
+            _userEntityManager = userEntityManager;
         }
 
         [Poster("/by-filter")]
@@ -31,7 +31,7 @@ namespace Tigernet.Samples.RestApi.Resters
         }
 
         [Poster("/new")]
-        public object Add()
+        public async ValueTask<object> Add()
         {
             User user = new User()
             {
@@ -40,11 +40,11 @@ namespace Tigernet.Samples.RestApi.Resters
                 Age = 28
             };
 
-            return Ok(_userEntityManager.Add(user));
+            return Ok(await _userEntityManager.CreateAsync(user));
         }
 
         [Putter("/update")]
-        public object Put()
+        public async ValueTask<object> Put()
         {
             User user = new User()
             {
@@ -52,8 +52,8 @@ namespace Tigernet.Samples.RestApi.Resters
                 Name = "Ali",
                 Age = 28
             };
-            
-            return Ok(_userEntityManager.Update(user));
+
+            return Ok(await _userEntityManager.UpdateAsync(user));
         }
     }
 }

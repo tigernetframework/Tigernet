@@ -11,4 +11,8 @@
     <ProjectReference Include="..\src\Tigernet.Hosting\Tigernet.Hosting.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.5" />
+  </ItemGroup>
+
 </Project>
