@@ -1,4 +1,5 @@
-﻿using Tigernet.Hosting.Models.Query;
+﻿using System.IO;
+using Tigernet.Hosting.Models.Query;
 
 namespace Tigernet.Hosting.Extensions
 {
@@ -13,14 +14,13 @@ namespace Tigernet.Hosting.Extensions
         /// <returns>An IEnumerable<T> object that contains the items for the current page.</returns>
         public static IEnumerable<T> Paginate<T>(this IEnumerable<T> source, PaginationOptions options)
         {
+            if (source == null || options == null)
+                throw new ArgumentException("Can't apply filter to null source or with null filter options");
+
             var itemsForSkip = (options.PageToken - 1) * options.PageSize;
             var totalCount = source.Count();
-
             if (itemsForSkip >= totalCount && totalCount > 0)
-            {
                 itemsForSkip = totalCount - totalCount % options.PageSize;
-            }
-
             return source.Skip(itemsForSkip).Take(options.PageSize);
         }
         /// <summary>
@@ -32,14 +32,13 @@ namespace Tigernet.Hosting.Extensions
         /// <returns>An IQueryable<T> object that contains the items for the current page.</returns>
         public static IQueryable<T> Paginate<T>(this IQueryable<T> source, PaginationOptions options)
         {
+            if (source == null || options == null)
+                throw new ArgumentException("Can't apply filter to null source or with null filter options");
+            
             var itemsForSkip = (options.PageToken - 1) * options.PageSize;
             var totalCount = source.Count();
-
             if (itemsForSkip >= totalCount && totalCount > 0)
-            {
                 itemsForSkip = totalCount - totalCount % options.PageSize;
-            }
-
             return source.Skip(itemsForSkip).Take(options.PageSize);
         }
 
