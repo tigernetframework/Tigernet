@@ -2,7 +2,7 @@
 using Tigernet.Hosting.DataAccess.Brokers;
 using Tigernet.Samples.RestApi.Brokers;
 
-var builder = new TigernetHostBuilder("http://localhost:5000/");
+var builder = new TigernetHostBuilder();
 
 // builder.AddService<IUserEntityManager, UserEntityManager>();
 builder.AddDataSourceProvider<IDataSourceBroker, EfCoreDataAccessBroker>();

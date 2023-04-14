@@ -1,17 +1,19 @@
+using Newtonsoft.Json;
 using System.Data;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using System.Text.Json.Serialization;
-using Newtonsoft.Json;
+using System.Text.Json;
 using Tigernet.Hosting.Attributes.HttpMethods;
 using Tigernet.Hosting.Attributes.HttpMethods.Commons;
+using Tigernet.Hosting.Attributes.RequestContents;
 using Tigernet.Hosting.Attributes.Resters;
 using Tigernet.Hosting.Exceptions;
+using Tigernet.Hosting.Extensions;
 using JsonConverter = System.Text.Json.Serialization.JsonConverter;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace Tigernet.Hosting; 
+namespace Tigernet.Hosting;
 
 #pragma warning disable
 /// <summary>
@@ -48,10 +50,10 @@ public partial class TigernetHostBuilder
     /// Constructor for TigernetHostBuilder class. It takes in a string prefix and sets it as the prefix for the HttpListener.
     /// </summary>
     /// <param name="prefix">The prefix for the HttpListener</param>
-    public TigernetHostBuilder(string prefix)
+    public TigernetHostBuilder()
     {
-        _prefix = prefix;
-        _listener.Prefixes.Add(prefix);
+        _prefix = GetPrefix();
+        _listener.Prefixes.Add(_prefix);
         _services = new Dictionary<Type, Type>();
     }
 
@@ -167,10 +169,11 @@ public partial class TigernetHostBuilder
                 var posterAttr = method.GetCustomAttribute<PosterAttribute>();
                 var patcherAttr = method.GetCustomAttribute<PatcherAttribute>();
                 var putterAttr = method.GetCustomAttribute<PutterAttribute>();
+                var deleterAttr = method.GetCustomAttribute<DeleterAttribute>();
 
                 HttpMethodAttribute? endpointAttr = GetValidatedMethodAttributes(new HttpMethodAttribute[]
                 {
-                    getterAttr, posterAttr, patcherAttr, putterAttr
+                    getterAttr, posterAttr, patcherAttr, putterAttr, deleterAttr
                 });
 
                 var route = Path.Combine("/", typeName.Split(new[] { "Rester" },
@@ -184,7 +187,7 @@ public partial class TigernetHostBuilder
             }
         }
     }
-    
+
     /// <summary>
     /// Retrieves a validated HttpMethodAttribute from an array of HttpMethodAttributes.
     /// </summary>
@@ -199,6 +202,13 @@ public partial class TigernetHostBuilder
         return httpMethodAttributes.FirstOrDefault(a => a != null);
     }
 
+    /// <summary>
+    /// Creates a handler function for processing HTTP requests.
+    /// </summary>
+    /// <param name="resterType">The type of the RESTful service.</param>
+    /// <param name="method">The method to invoke on the RESTful service.</param>
+    /// <param name="attribute">The HTTP method attribute associated with the method.</param>
+    /// <returns>A delegate representing the handler function.</returns>
     private Func<HttpListenerContext, Task> CreateHandlerFunc(Type resterType, MethodInfo method, HttpMethodAttribute attribute)
     {
         return async context =>
@@ -259,6 +269,12 @@ public partial class TigernetHostBuilder
         };
     }
 
+    /// <summary>
+    /// Retrieves the arguments to be passed to the RESTful service method.
+    /// </summary>
+    /// <param name="method">The method to invoke on the RESTful service.</param>
+    /// <param name="context">The HTTP listener context.</param>
+    /// <returns>An array of objects representing the arguments to be passed to the method.</returns>
     private async ValueTask<object[]> GetArguments(MethodInfo method, HttpListenerContext context)
     {
         var parameters = method.GetParameters();
@@ -266,24 +282,37 @@ public partial class TigernetHostBuilder
 
         for (int i = 0; i < parameters.Length; i++)
         {
-            var parameterType = parameters[i].ParameterType;
-            if (parameterType == typeof(HttpListenerContext))
+            var parameterAttributes = 
+                                    parameters[i].GetCustomAttributes<RequestContentAttribute>() 
+                                    ?? new List<RequestContentAttribute>();
+            if (parameterAttributes.Any())
             {
-                args[i] = context;
+                if (parameterAttributes.Count() > 1)
+                    throw new ArgumentException($"In {method.Name} argument have multiple http request content. In parameter {parameters[i].Name}");
+                
+                var parameterType = parameters[i].ParameterType;
+                args[i] = context.Request.GetInjectingRequestData(parameterType,
+                    parameterAttributes!.First()!.DataMapSource);
             }
             else
             {
                 args[i] = null;
             }
 
-            var content = await GetRequestContentAsync(context.Request, parameterType);
-            if (content != default)
-                args[i] = content;
+           // var content = await GetRequestContentAsync(context.Request, parameterType);
+           // if (content != default)
+           //     args[i] = content;
         }
 
         return args;
     }
 
+    /// <summary>
+    /// Retrieves the content of the HTTP request body and deserializes it to the expected type.
+    /// </summary>
+    /// <param name="request">The HTTP listener request.</param>
+    /// <param name="expectedType">The expected type of the deserialized object.</param>
+    /// <returns>The deserialized object, or null if the request has no content or deserialization fails.</returns>
     private async ValueTask<object?> GetRequestContentAsync(HttpListenerRequest request, Type expectedType)
     {
         if (request.ContentLength64 == 0)
@@ -302,5 +331,26 @@ public partial class TigernetHostBuilder
         }
 
         return result;
+    }
+
+    private string GetPrefix()
+    {
+        // get the assembly that is using this library
+        var assembly = Assembly.GetCallingAssembly();
+
+        // Set the path of the file within the project
+        string filePath = @"../../../Properties/launchSettings.json";
+
+        // Read the contents of the file
+        string launchSettingsJson = File.ReadAllText(filePath);
+
+        // Parse the JSON string into a JsonDocument object
+        JsonDocument launchSettingsDoc = JsonDocument.Parse(launchSettingsJson);
+
+        // Navigate the JSON object to get the desired value
+        JsonElement applicationUrlElement = launchSettingsDoc.RootElement
+            .GetProperty("applicationUrl");
+
+        return applicationUrlElement.GetString();
     }
 }

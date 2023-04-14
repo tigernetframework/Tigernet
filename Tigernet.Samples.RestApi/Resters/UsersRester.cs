@@ -1,5 +1,6 @@
-﻿using Tigernet.Hosting.Actions;
+using Tigernet.Hosting.Actions;
 using Tigernet.Hosting.Attributes.HttpMethods;
+using Tigernet.Hosting.Attributes.RequestContents;
 using Tigernet.Hosting.Attributes.Resters;
 using Tigernet.Hosting.DataAccess.Models.Query;
 using Tigernet.Hosting.DataAccess.Services;
@@ -18,13 +19,13 @@ namespace Tigernet.Samples.RestApi.Resters
         }
 
         [Poster("/by-filter")]
-        public async ValueTask<object> GetByFilter(EntityQueryOptions<User> model)
+        public async ValueTask<object> GetByFilter([FromBody] EntityQueryOptions<User> model)
         {
             return Ok(await _userEntityManager.GetAsync(model));
         }
 
         [Getter]
-        public async ValueTask<object> Get()
+        public async ValueTask<object> Get([FromBody] int id)
         {
             var result = await _userEntityManager.GetByIdAsync(1);
             return Ok(result);
@@ -54,6 +55,12 @@ namespace Tigernet.Samples.RestApi.Resters
             };
 
             return Ok(await _userEntityManager.UpdateAsync(user));
+        }
+
+        [Deleter("/delete")]
+        public async ValueTask<object> Delete(int userUd)
+        {
+            return Ok(await _userEntityManager.DeleteAsync(6));
         }
     }
 }

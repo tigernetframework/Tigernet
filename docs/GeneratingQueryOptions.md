@@ -1,4 +1,4 @@
-# Generating query options can be made easy by utilizing extension methods that provide a range of features for querying. These methods include: `1.2`
+# Generating query options can be made easily by utilizing extension methods that provide a range of features for querying. These methods include: `1.2`
 
 - CreateQuery: creates a new query object for the specified entity type.
 - AddFilter: filters data based on specific criteria, such as location or ID.
