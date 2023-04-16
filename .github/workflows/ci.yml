@@ -1,22 +1,28 @@
-name: .NET CI
+name: .NET CD/CI
+
 on:
   pull_request:
   push:
     branches:
-    - main
+      - main
+      - dev
 jobs:
   build:
     runs-on: windows-latest
     steps:
     - name: Check Out
       uses: actions/checkout@v2
+      
     - name: Setup .NET Version
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 7.0.x
+        
     - name: Restore Dependencies
       run: dotnet restore
+      
     - name: Build Solution
       run: dotnet build --no-restore
+      
     - name: Test Solution
       run: dotnet test --no-build --verbosity normal
