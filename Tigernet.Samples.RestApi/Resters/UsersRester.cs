@@ -25,42 +25,28 @@ namespace Tigernet.Samples.RestApi.Resters
         }
 
         [Getter]
-        public async ValueTask<object> Get([FromBody] int id)
+        public async ValueTask<object> Get([FromBody]long id)
         {
-            var result = await _userEntityManager.GetByIdAsync(1);
+            var result = await _userEntityManager.GetByIdAsync(id);
             return Ok(result);
         }
 
         [Poster("/new")]
-        public async ValueTask<object> Add()
+        public async ValueTask<object> Add([FromBody]User user)
         {
-            User user = new User()
-            {
-                Id = 7,
-                Name = "Ikrom",
-                Age = 28
-            };
-
             return Ok(await _userEntityManager.CreateAsync(user));
         }
 
         [Putter("/update")]
-        public async ValueTask<object> Put()
+        public async ValueTask<object> Put([FromBody]User user)
         {
-            User user = new User()
-            {
-                Id = 7,
-                Name = "Ali",
-                Age = 28
-            };
-
             return Ok(await _userEntityManager.UpdateAsync(user));
         }
 
         [Deleter("/delete")]
-        public async ValueTask<object> Delete(int userUd)
+        public async ValueTask<object> Delete(long userId)
         {
-            return Ok(await _userEntityManager.DeleteAsync(6));
+            return Ok(await _userEntityManager.DeleteAsync(userId));
         }
     }
 }

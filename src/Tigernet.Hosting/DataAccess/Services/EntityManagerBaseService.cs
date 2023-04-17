@@ -75,6 +75,7 @@ public class EntityManagerBaseService<TEntity> : IEntityManagerBaseService<TEnti
         if (entity is null)
             throw new ArgumentException("Cannot update null entity", nameof(entity));
 
+        _ = await GetByIdAsync(entity.Id, cancellationToken) ?? throw new EntityNotFoundException();
         await _dataSourceBroker.UpdateAsync(entity, cancellationToken);
         return !save || await _dataSourceBroker.SaveAsync(cancellationToken) ? entity : throw new Exception("Failed to update entity");
     }
