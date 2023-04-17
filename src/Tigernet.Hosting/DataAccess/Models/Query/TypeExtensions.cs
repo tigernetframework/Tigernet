@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 using Tigernet.Hosting.Attributes.Query;
-using Tigernet.Hosting.Models.Query;
+using Tigernet.Hosting.DataAccess.Models.QueryOptions;
 
-namespace Tigernet.Hosting.Extensions;
+namespace Tigernet.Hosting.DataAccess.Models.Query;
 
 /// <summary>
 /// Extensions for type operations

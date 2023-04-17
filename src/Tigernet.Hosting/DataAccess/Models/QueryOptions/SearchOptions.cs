@@ -1,8 +1,9 @@
-﻿namespace Tigernet.Hosting.Models.Query;
+﻿namespace Tigernet.Hosting.DataAccess.Models.QueryOptions;
 
 /// <summary>
 /// Represents search options
 /// </summary>
+/// <typeparam name="TModel">Query source type</typeparam>
 public class SearchOptions<TModel> where TModel : class
 {
     public SearchOptions(string keyword, bool includeChildren) =>
@@ -11,10 +12,10 @@ public class SearchOptions<TModel> where TModel : class
     /// <summary>
     /// Search keyword
     /// </summary>
-    public string Keyword { get; }
+    public string Keyword { get; init; }
 
     /// <summary>
     /// Determines whether to search from direct children
     /// </summary>
-    public bool IncludeChildren { get; }
+    public bool IncludeChildren { get; init; }
 }

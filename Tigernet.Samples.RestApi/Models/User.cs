@@ -1,12 +1,12 @@
-﻿using Tigernet.Hosting.Attributes.Query;
-using Tigernet.Hosting.Models.Common;
+using Tigernet.Hosting.Attributes.Query;
+using Tigernet.Hosting.DataAccess.Models.Entity;
 
 namespace Tigernet.Samples.RestApi.Models
 {
-    public class User : IEntity<int>, IQueryableEntity
+    public class User : IEntity, IQueryableEntity
     {
-        public int Id { get; set; }
-
+        public long Id { get; set; }
+        
         [SearchableProperty]
         public string Name { get; set; }
 

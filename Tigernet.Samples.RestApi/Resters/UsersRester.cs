@@ -1,9 +1,9 @@
-﻿using Tigernet.Hosting.Actions;
+using Tigernet.Hosting.Actions;
 using Tigernet.Hosting.Attributes.HttpMethods;
 using Tigernet.Hosting.Attributes.RequestContents;
 using Tigernet.Hosting.Attributes.Resters;
-using Tigernet.Hosting.Models.Query;
-using Tigernet.Samples.RestApi.Clevers.Interfaces;
+using Tigernet.Hosting.DataAccess.Models.Query;
+using Tigernet.Hosting.DataAccess.Services;
 using Tigernet.Samples.RestApi.Models;
 
 namespace Tigernet.Samples.RestApi.Resters
@@ -11,51 +11,42 @@ namespace Tigernet.Samples.RestApi.Resters
     [ApiRester]
     public class UsersRester : ResterBase
     {
-        private readonly IUserClever userClever;
+        private readonly IEntityManagerBaseService<User> _userEntityManager;
 
-        public UsersRester(IUserClever userClever)
+        public UsersRester(IEntityManagerBaseService<User> userEntityManager)
         {
-            this.userClever = userClever;
+            _userEntityManager = userEntityManager;
         }
 
         [Poster("/by-filter")]
-        public async ValueTask<object> GetByFilter(EntityQueryOptions<User> model)
+        public async ValueTask<object> GetByFilter([FromBody] EntityQueryOptions<User> model)
         {
-            return Ok(await userClever.GetAsync(model));
+            return Ok(await _userEntityManager.GetAsync(model));
         }
 
         [Getter]
-        public async ValueTask<object> Get([FromBody] int id)
+        public async ValueTask<object> Get([FromBody]long id)
         {
-            var result = await userClever.GetByIdAsync(id);
-
+            var result = await _userEntityManager.GetByIdAsync(id);
             return Ok(result);
         }
 
         [Poster("/new")]
-        public object Add([FromBody] User user)
+        public async ValueTask<object> Add([FromBody]User user)
         {
-            return Ok(userClever.Add(user));
+            return Ok(await _userEntityManager.CreateAsync(user));
         }
 
         [Putter("/update")]
-        public object Put()
+        public async ValueTask<object> Put([FromBody]User user)
         {
-            User user = new User()
-            {
-                Id = 7,
-                Name = "Ali",
-                Age = 28
-            };
-
-            return Ok(userClever.Update(user.Id, user));
+            return Ok(await _userEntityManager.UpdateAsync(user));
         }
 
         [Deleter("/delete")]
-        public object Delete(int userUd)
+        public async ValueTask<object> Delete([FromBody]long userId)
         {
-            var res = userClever.Delete(7);
-            return Ok(res);
+            return Ok(await _userEntityManager.DeleteAsync(userId));
         }
     }
 }

@@ -1,6 +1,7 @@
-﻿using Tigernet.Hosting.Models.Common;
+﻿using Tigernet.Hosting.DataAccess.Models.Entity;
+using Tigernet.Hosting.DataAccess.Models.QueryOptions;
 
-namespace Tigernet.Hosting.Models.Query;
+namespace Tigernet.Hosting.DataAccess.Models.Query;
 
 /// <summary>
 /// Represents queryable entities source query options

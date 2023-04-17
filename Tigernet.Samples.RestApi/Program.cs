@@ -1,10 +1,11 @@
 ﻿using Tigernet.Hosting;
-using Tigernet.Samples.RestApi.Clevers;
-using Tigernet.Samples.RestApi.Clevers.Interfaces;
+using Tigernet.Hosting.DataAccess.Brokers;
+using Tigernet.Samples.RestApi.Brokers;
 
 var builder = new TigernetHostBuilder();
 
-builder.AddService<IUserClever, UserClever>();
+// builder.AddService<IUserEntityManager, UserEntityManager>();
+builder.AddDataSourceProvider<IDataStorageBroker, EfCoreDataStorageBroker>();
 
 builder.MapResters();
 
@@ -21,4 +22,3 @@ builder.MapResters();
 //});
 
 await builder.Start();
-

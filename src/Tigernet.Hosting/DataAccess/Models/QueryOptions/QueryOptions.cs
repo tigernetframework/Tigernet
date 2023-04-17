@@ -1,9 +1,9 @@
-﻿namespace Tigernet.Hosting.Models.Query;
+﻿namespace Tigernet.Hosting.DataAccess.Models.QueryOptions;
 
 /// <summary>
 /// Represents queryable source query options
 /// </summary>
-/// <typeparam name="TModel"></typeparam>
+/// <typeparam name="TModel">Query source type</typeparam>
 public class QueryOptions<TModel> : IQueryOptions<TModel> where TModel : class
 {
     public QueryOptions()

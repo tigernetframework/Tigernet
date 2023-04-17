@@ -1,4 +1,4 @@
-﻿namespace Tigernet.Hosting.Models.Common
+﻿namespace Tigernet.Hosting.DataAccess.Models.Entity
 {
     /// <summary>
     /// Defines queryable entity

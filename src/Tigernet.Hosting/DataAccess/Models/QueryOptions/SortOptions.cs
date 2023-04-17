@@ -1,4 +1,4 @@
-﻿namespace Tigernet.Hosting.Models.Query;
+﻿namespace Tigernet.Hosting.DataAccess.Models.QueryOptions;
 
 /// <summary>
 /// Represents collection sort options
@@ -6,15 +6,15 @@
 /// <typeparam name="TModel"></typeparam>
 public class SortOptions<TModel>
 {
-    public SortOptions(string sortField, bool sortAscending = true) => (SortField, SortAscending) = (sortField, sortAscending);
+    public SortOptions(string orderBy, bool orderAscending = true) => (OrderBy, OrderAscending) = (orderBy, orderAscending);
 
     /// <summary>
     /// Sort field
     /// </summary>
-    public string SortField { get; }
+    public string OrderBy { get; init; }
 
     /// <summary>
     /// Indicates whether to sort ascending
     /// </summary>
-    public bool SortAscending { get; }
+    public bool OrderAscending { get; init; }
 }

@@ -1,4 +1,4 @@
-﻿namespace Tigernet.Hosting.Models.Query;
+﻿namespace Tigernet.Hosting.DataAccess.Models.QueryOptions;
 
 /// <summary>
 /// Represents pagination options
@@ -17,7 +17,7 @@ public class PaginationOptions
     public int PageSize
     {
         get => _pageSize;
-        set => _pageSize = value <= 0 ? 20 : value;
+        init => _pageSize = value <= 0 ? 20 : value;
     }
 
     /// <summary>
@@ -27,6 +27,6 @@ public class PaginationOptions
     public int PageToken
     {
         get => _pageToken;
-        set => _pageToken = value <= 0 ? 1 : value;
+        init => _pageToken = value <= 0 ? 1 : value;
     }
 }

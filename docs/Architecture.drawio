@@ -1,0 +1,44 @@
+<mxfile host="65bd71144e">
+    <diagram id="E4F5IabE_gzI5Q81bNId" name="Page-1">
+        <mxGraphModel dx="4049" dy="5054" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="58" style="edgeStyle=none;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="45" target="49">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="-1840" y="-2960"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="45" value="Data Source Provider Contract" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;fontColor=#ffae00;strokeColor=#BD7000;strokeWidth=3;" parent="1" vertex="1">
+                    <mxGeometry x="-2167.5" y="-3030" width="155" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="48" value="Data Access" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="-2180" y="-3400" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="49" value="EF Core Data Source Provider" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;fontColor=#ffae00;strokeColor=#BD7000;strokeWidth=3;" parent="1" vertex="1">
+                    <mxGeometry x="-1920" y="-3230" width="160" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="51" style="edgeStyle=none;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="50" target="45" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="50" value="Entity Manager Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;fontColor=#ffae00;strokeColor=#BD7000;strokeWidth=3;" parent="1" vertex="1">
+                    <mxGeometry x="-2167.5" y="-2830" width="155" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="55" style="edgeStyle=none;html=1;" parent="1" source="54" target="50" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="54" value="User Manager Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;fontColor=#ffae00;strokeColor=#BD7000;strokeWidth=3;" parent="1" vertex="1">
+                    <mxGeometry x="-2167.5" y="-2630" width="155" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="56" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="-2350" y="-2660" as="sourcePoint"/>
+                        <mxPoint x="-1800" y="-2660" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

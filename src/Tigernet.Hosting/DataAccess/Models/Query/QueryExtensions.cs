@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
-using Tigernet.Hosting.Models.Common;
-using Tigernet.Hosting.Models.Query;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
+using Tigernet.Hosting.DataAccess.Models.Entity;
+using Tigernet.Hosting.DataAccess.Models.QueryOptions;
 
-namespace Tigernet.Hosting.Extensions;
+namespace Tigernet.Hosting.DataAccess.Models.Query;
 
 public static class QueryExtensions
 {
@@ -269,7 +269,7 @@ public static class QueryExtensions
         var properties = typeof(TModel).GetProperties().Where(x => x.PropertyType.IsSimpleType()).ToList();
 
         // Apply sorting
-        var matchingProperty = properties.FirstOrDefault(x => x.Name.ToLower() == sortOptions.SortField.ToLower());
+        var matchingProperty = properties.FirstOrDefault(x => x.Name.ToLower() == sortOptions.OrderBy.ToLower());
 
         if (matchingProperty == null)
             return source;
@@ -277,7 +277,7 @@ public static class QueryExtensions
         var memExp = Expression.PropertyOrField(parameter, matchingProperty.Name);
         var keySelector = Expression.Lambda<Func<TModel, object>>(memExp, true, parameter).Compile();
 
-        return sortOptions.SortAscending ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
+        return sortOptions.OrderAscending ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
     }
 
     /// <summary>
@@ -297,14 +297,14 @@ public static class QueryExtensions
         var properties = typeof(TModel).GetProperties().Where(x => x.PropertyType.IsSimpleType()).ToList();
 
         // Apply sorting
-        var matchingProperty = properties.FirstOrDefault(x => x.Name.ToLower() == sortOptions.SortField.ToLower());
+        var matchingProperty = properties.FirstOrDefault(x => x.Name.ToLower() == sortOptions.OrderBy.ToLower());
 
         if (matchingProperty == null)
             return source;
 
         var memExp = Expression.Convert(Expression.PropertyOrField(parameter, matchingProperty.Name), typeof(object));
         var keySelector = Expression.Lambda<Func<TModel, dynamic>>(memExp, true, parameter);
-        return sortOptions.SortAscending ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
+        return sortOptions.OrderAscending ? source.OrderBy(keySelector) : source.OrderByDescending(keySelector);
     }
 
     #endregion
@@ -372,7 +372,6 @@ public static class QueryExtensions
             throw new ArgumentException("Can't apply include to null source or with null include options");
 
         // Include models
-        includeOptions.IncludeModels = includeOptions.IncludeModels.Select(x => x.ToLower()).ToList();
         var includeModels = typeof(TEntity).GetDirectChildEntities()
             .Where(x => includeOptions.IncludeModels.Any(y => x.Name.Equals(y, StringComparison.InvariantCultureIgnoreCase)))
             .ToList();

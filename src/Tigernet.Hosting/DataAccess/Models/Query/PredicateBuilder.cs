@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Tigernet.Hosting.Models.Query;
+namespace Tigernet.Hosting.DataAccess.Models.Query;
 
 /// <summary>
 /// Provides extensions to build predicate expressions

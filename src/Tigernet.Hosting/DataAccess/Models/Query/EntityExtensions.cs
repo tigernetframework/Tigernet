@@ -1,6 +1,6 @@
-using Tigernet.Hosting.Models.Common;
+using Tigernet.Hosting.DataAccess.Models.Entity;
 
-namespace Tigernet.Hosting.Extensions;
+namespace Tigernet.Hosting.DataAccess.Models.Query;
 
 /// <summary>
 /// Provides extensions specifically for entities

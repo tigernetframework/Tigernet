@@ -1,4 +1,6 @@
-﻿namespace Tigernet.Hosting.Attributes.HttpMethods;
+﻿using Tigernet.Hosting.Attributes.HttpMethods.Commons;
+
+namespace Tigernet.Hosting.Attributes.HttpMethods;
 public class PutterAttribute : HttpMethodAttribute
 {
     /// <inheritdoc />

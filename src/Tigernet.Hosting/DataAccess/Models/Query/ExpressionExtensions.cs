@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Tigernet.Hosting.Extensions;
+namespace Tigernet.Hosting.DataAccess.Models.Query;
 
 /// <summary>
 /// Extends <see cref="Expression"/> base and other types

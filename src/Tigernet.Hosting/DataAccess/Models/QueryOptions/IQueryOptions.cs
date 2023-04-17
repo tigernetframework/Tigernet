@@ -1,4 +1,4 @@
-﻿namespace Tigernet.Hosting.Models.Query;
+﻿namespace Tigernet.Hosting.DataAccess.Models.QueryOptions;
 
 /// <summary>
 /// Defines properties for queryable source query options

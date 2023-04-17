@@ -1,8 +1,8 @@
 ﻿using System.Linq.Expressions;
-using Tigernet.Hosting.Models.Common;
-using Tigernet.Hosting.Models.Query;
+using Tigernet.Hosting.DataAccess.Models.Entity;
+using Tigernet.Hosting.DataAccess.Models.QueryOptions;
 
-namespace Tigernet.Hosting.Extensions;
+namespace Tigernet.Hosting.DataAccess.Models.Query;
 
 /// <summary>
 /// Provides extension methods to create query options

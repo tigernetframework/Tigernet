@@ -1,7 +1,7 @@
-﻿namespace Tigernet.Hosting.Models.Query;
+﻿namespace Tigernet.Hosting.DataAccess.Models.QueryOptions;
 
 /// <summary>
-/// Represents queryable source query options
+/// Represents filter options unit
 /// </summary>
 public class QueryFilter
 {
@@ -10,10 +10,10 @@ public class QueryFilter
     /// <summary>
     /// Field key name
     /// </summary>
-    public string Key { get; }
+    public string Key { get; init; }
 
     /// <summary>
     /// Filtering value
     /// </summary>
-    public string? Value { get; }
+    public string? Value { get; init; }
 }

@@ -1,11 +1,11 @@
-﻿using Tigernet.Hosting.Models.Common;
+﻿using Tigernet.Hosting.DataAccess.Models.Entity;
 
-namespace Tigernet.Hosting.Models.Query;
+namespace Tigernet.Hosting.DataAccess.Models.QueryOptions;
 
 /// <summary>
 /// Defines properties for queryable entities source query options
 /// </summary>
-/// <typeparam name="TEntity"></typeparam>
+/// <typeparam name="TEntity">Query source type</typeparam>
 public interface IEntityQueryOptions<TEntity> : IQueryOptions<TEntity> where TEntity : class, IQueryableEntity
 {
     /// <summary>
