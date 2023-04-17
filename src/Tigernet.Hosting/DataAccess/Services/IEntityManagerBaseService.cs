@@ -50,13 +50,21 @@ public interface IEntityManagerBaseService<TEntity> where TEntity : class, IEnti
     ValueTask<TEntity?> GetByIdAsync(long id, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Checks entity by Id
+    /// </summary>
+    /// <param name="id">Id of entity</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Entity if found, otherwise null</returns>
+    ValueTask<bool> CheckByIdAsync(long id, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Adds entity in context scope or saves it to database
     /// </summary>
     /// <param name="entity">Entity being created</param>
     /// <param name="save">Determines whether to commit changes to database</param>
     /// <param name="cancellationToken">Cancellation Token</param>
     /// <returns>Created entity</returns>
-    ValueTask<TEntity> CreateAsync(TEntity entity, bool save = true, CancellationToken cancellationToken = default);
+    ValueTask<TEntity?> CreateAsync(TEntity entity, bool save = true, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Updates entity in context scope or saves it to database

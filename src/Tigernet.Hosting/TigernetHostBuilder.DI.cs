@@ -20,7 +20,7 @@ namespace Tigernet.Hosting
             _services[typeof(T)] = typeof(TImpl);
         }
 
-        public void AddDataSourceProvider<TInterface, TImplementation>() where TImplementation : class, IDataSourceBroker, new()
+        public void AddDataSourceProvider<TInterface, TImplementation>() where TImplementation : class, IDataStorageBroker, new()
         {
             _services[typeof(TInterface)] = typeof(TImplementation);
 

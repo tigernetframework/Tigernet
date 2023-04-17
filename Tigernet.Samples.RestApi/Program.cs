@@ -5,7 +5,7 @@ using Tigernet.Samples.RestApi.Brokers;
 var builder = new TigernetHostBuilder();
 
 // builder.AddService<IUserEntityManager, UserEntityManager>();
-builder.AddDataSourceProvider<IDataSourceBroker, EfCoreDataAccessBroker>();
+builder.AddDataSourceProvider<IDataStorageBroker, EfCoreDataStorageBroker>();
 
 builder.MapResters();
 

@@ -3,28 +3,47 @@ using Tigernet.Hosting.DataAccess.Models.Entity;
 
 namespace Tigernet.Hosting.DataAccess.Brokers;
 
-public interface IDataSourceBroker
+public interface IDataStorageBroker
 {
     /// <summary>
-    /// Gets entity set as queryable collection without decryption
+    /// Selects entity set as queryable collection without decryption
     /// </summary>
     /// <param name="expression">Predicate expression</param>
     /// <returns>Queryable collection of entity</returns>
-    IQueryable<TEntity> Get<TEntity>(Expression<Func<TEntity, bool>> expression) where TEntity : class, IEntity;
+    IQueryable<TEntity> Select<TEntity>(Expression<Func<TEntity, bool>> expression) where TEntity : class, IEntity;
+    
+    /// <summary>
+    /// Selects entity by id
+    /// </summary>
+    /// <param name="id">Entity id being selected</param>
+    /// <param name="cancellationToken">Cancellation Token</param>
+    /// <typeparam name="TEntity">Entity type</typeparam>
+    /// <returns>Entity if found, otherwise null</returns>
+    ValueTask<TEntity?> SelectByIdAsync<TEntity>(long id, CancellationToken cancellationToken = default) where TEntity : class, IEntity;
+    
+    /// <summary>
+    /// Checks entity by Id
+    /// </summary>
+    /// <param name="id">Id of entity</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Entity if found, otherwise null</returns>
+    ValueTask<bool> CheckByIdAsync<TEntity>(long id, CancellationToken cancellationToken = default) where TEntity : class, IEntity;
 
     /// <summary>
-    /// Adds entity in context scope or saves it to database
+    /// Inserts entity in context scope or saves it to database
     /// </summary>
     /// <param name="entity">Entity being created</param>
     /// <param name="cancellationToken">Cancellation Token</param>
+    /// <typeparam name="TEntity">Entity type</typeparam>
     /// <returns>Created entity if succeeded, otherwise null</returns>
-    ValueTask<TEntity?> CreateAsync<TEntity>(TEntity entity, CancellationToken cancellationToken = default) where TEntity : class, IEntity;
+    ValueTask<TEntity?> InsertAsync<TEntity>(TEntity entity, CancellationToken cancellationToken = default) where TEntity : class, IEntity;
 
     /// <summary>
     /// Updates entity in context scope or saves it to database
     /// </summary>
     /// <param name="entity">Entity being updated</param>
     /// <param name="cancellationToken">Cancellation Token</param>
+    /// <typeparam name="TEntity">Entity type</typeparam>
     /// <returns>Updated entity if succeeded, otherwise null</returns>
     ValueTask<TEntity?> UpdateAsync<TEntity>(TEntity entity, CancellationToken cancellationToken = default) where TEntity : class, IEntity;
 
@@ -33,6 +52,7 @@ public interface IDataSourceBroker
     /// </summary>
     /// <param name="entity">Entity being deleted</param>
     /// <param name="cancellationToken">Cancellation Token</param>
+    /// <typeparam name="TEntity">Entity type</typeparam>
     /// <returns>Deleted entity if succeeded, otherwise null</returns>
     ValueTask<TEntity?> DeleteAsync<TEntity>(TEntity entity, CancellationToken cancellationToken = default) where TEntity : class?, IEntity?;
 

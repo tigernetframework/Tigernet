@@ -44,7 +44,7 @@ namespace Tigernet.Samples.RestApi.Resters
         }
 
         [Deleter("/delete")]
-        public async ValueTask<object> Delete(long userId)
+        public async ValueTask<object> Delete([FromBody]long userId)
         {
             return Ok(await _userEntityManager.DeleteAsync(userId));
         }
