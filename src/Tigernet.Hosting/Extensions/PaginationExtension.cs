@@ -1,5 +1,4 @@
-﻿using System.IO;
-using Tigernet.Hosting.Models.Query;
+﻿using Tigernet.Hosting.DataAccess.Models.QueryOptions;
 
 namespace Tigernet.Hosting.Extensions
 {
