@@ -16,7 +16,7 @@ host.MapRoute("/", async context =>
     }
 });
 
-host.MapRoute("/about", async context =>
+host.MapRoute("/about/{id}", async context =>
 {
     var response = context.Response;
     response.ContentType = "text/html";

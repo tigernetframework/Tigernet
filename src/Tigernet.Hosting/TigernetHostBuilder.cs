@@ -7,12 +7,10 @@ using System.Text.Json;
 using Tigernet.Hosting.Attributes.HttpMethods;
 using Tigernet.Hosting.Attributes.RequestContents;
 using Tigernet.Hosting.Attributes.HttpMethods.Commons;
-using Tigernet.Hosting.Attributes.RequestContents;
 using Tigernet.Hosting.Attributes.Resters;
 using Tigernet.Hosting.Exceptions;
 using Tigernet.Hosting.Extensions;
-using JsonConverter = System.Text.Json.Serialization.JsonConverter;
-using JsonSerializer = System.Text.Json.JsonSerializer;
+using System.Text.RegularExpressions;
 
 namespace Tigernet.Hosting;
 
@@ -122,11 +120,14 @@ public partial class TigernetHostBuilder
         }
 
         // if middleware is not exist
-        Func<HttpListenerContext, Task> handler;
-        if (_routes.TryGetValue(request.RawUrl, out handler))
+        var matchingRoute = _routes.FirstOrDefault(route =>
         {
-            await handler(context);
-        }
+            var regexPattern = "^" + Regex.Replace(route.Key, @"\{([^}]+)\}", "(?<$1>[^/]+)") + "$";
+            var regex = new Regex(regexPattern, RegexOptions.IgnoreCase);
+            return regex.IsMatch(request.Url.AbsolutePath);
+        });
+        if (matchingRoute.Value != null)
+            await matchingRoute.Value(context);
         else
         {
             response.StatusCode = (int)HttpStatusCode.NotFound;
@@ -269,7 +270,7 @@ public partial class TigernetHostBuilder
             }
         };
     }
-
+  
     /// <summary>
     /// Retrieves the arguments to be passed to the RESTful service method.
     /// </summary>
