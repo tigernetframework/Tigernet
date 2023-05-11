@@ -4,13 +4,9 @@ namespace Tigernet.Hosting.Actions
 {
     public abstract class ResterBase
     {
-        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+        public object Ok(object data)
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
-        public object Ok<T>(T data)
-        {
-            return JsonSerializer.Serialize(data, _jsonSerializerOptions);
+            return JsonSerializer.Serialize(data);
         }
     }
 }
